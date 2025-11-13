@@ -1,14 +1,18 @@
+import 'react-native-reanimated';
+
 import * as Calendar from 'expo-calendar';
 import { useEffect } from 'react';
 import { Button, Platform, StyleSheet, Text, View } from 'react-native';
-import 'react-native-reanimated';
 
+import { useColorScheme } from '@/hooks/use-color-scheme';
 
 export const unstable_settings = {
   anchor: '(tabs)',
 };
 
 export default function RootLayout() {
+  const colorScheme = useColorScheme();
+
   useEffect(() => {
     (async () => {
       const { status } = await Calendar.requestCalendarPermissionsAsync();
@@ -34,24 +38,37 @@ async function getDefaultCalendarSource() {
 }
 
 async function createCalendar() {
-  const defaultCalendarSource =
-    Platform.OS === 'ios'
-      ? await getDefaultCalendarSource()
-      : { 
-          type: Calendar.SourceType.LOCAL,
-          isLocalAccount: true, 
-          name: 'Expo Calendar' 
-        };
-  const newCalendarID = await Calendar.createCalendarAsync({
-    title: 'Expo Calendar',
-    color: 'blue',
-    entityType: Calendar.EntityTypes.EVENT,
-    source: defaultCalendarSource,
-    name: 'internalCalendarName',
-    ownerAccount: 'personal',
-    accessLevel: Calendar.CalendarAccessLevel.OWNER,
-  });
-  console.log(`Your new calendar ID is: ${newCalendarID}`);
+  try {
+    let source;
+    if (Platform.OS === 'ios') {
+      const defaultCalendar = await Calendar.getDefaultCalendarAsync();
+      source = defaultCalendar?.source ?? { name: 'Expo Calendar', isLocalAccount: true };
+    } else {
+      source = { isLocalAccount: true, name: 'Expo Calendar' };
+    }
+
+    const calendarParams: any = {
+      title: 'Expo Calendar',
+      color: 'blue',
+      entityType: Calendar.EntityTypes.EVENT,
+      name: 'internalCalendarName',
+      source,
+      ownerAccount: 'personal',
+      accessLevel: Calendar.CalendarAccessLevel.OWNER, // required
+    };
+
+    if (Platform.OS === 'ios') {
+      if (source && typeof (source as any).id !== 'undefined') {
+        calendarParams.sourceId = (source as any).id;
+      }
+      calendarParams.ownerAccount = 'personal';
+    }
+
+    const newCalendarID = await Calendar.createCalendarAsync(calendarParams);
+    console.log(`Your new calendar ID is: ${newCalendarID}`);
+  } catch (err) {
+    console.error('createCalendar failed', err);
+  }
 }
 
 const styles = StyleSheet.create({
@@ -61,5 +78,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-around',
   },
-})
-
+});
