@@ -28,6 +28,7 @@ export default function RootLayout() {
     <View style={styles.container}>
       <Text>Calendar Module Example</Text>
       <Button title="Create a new calendar" onPress={createCalendar} />
+      <Button title="Delete Expo Calendars" onPress={deleteExpoCalendars} />
     </View>
   );
 }
@@ -35,6 +36,23 @@ export default function RootLayout() {
 async function getDefaultCalendarSource() {
   const defaultCalendar = await Calendar.getDefaultCalendarAsync();
   return defaultCalendar.source;
+}
+
+async function deleteExpoCalendars() {
+  try {
+    const calendars = await Calendar.getCalendarsAsync(Calendar.EntityTypes.EVENT);
+    let deletedCount = 0;
+    for (const calendar of calendars) {
+      if (calendar.title === 'Expo Calendar') {
+        await Calendar.deleteCalendarAsync(calendar.id);
+        console.log(`Deleted calendar with id: ${calendar.id}`);
+        deletedCount++;
+      }
+    }
+    console.log(`Deleted ${deletedCount} calendars.`);
+  } catch (err) {
+    console.error('deleteCalendars failed', err);
+  }
 }
 
 async function createCalendar() {
