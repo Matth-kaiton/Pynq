@@ -10,27 +10,50 @@ export const unstable_settings = {
   anchor: '(tabs)',
 };
 
+
+/* list and user to find need to */
+var calendarList: string[] = [];
+const user = "quentinreinette@gmail.com" 
+
 export default function RootLayout() {
   const colorScheme = useColorScheme();
+
 
   useEffect(() => {
     (async () => {
       const { status } = await Calendar.requestCalendarPermissionsAsync();
       if (status === 'granted') {
         const calendars = await Calendar.getCalendarsAsync(Calendar.EntityTypes.EVENT);
+        
         console.log('Here are all your calendars:');
-        console.log({ calendars });
+        console.log( calendars );
+  
       }
     })();
   }, []);
+
+   
 
   return (
     <View style={styles.container}>
       <Text>Calendar Module Example</Text>
       <Button title="Create a new calendar" onPress={createCalendar} />
+      <Button title='Get event' onPress={getEvent} />
       <Button title="Delete Expo Calendars" onPress={deleteExpoCalendars} />
     </View>
   );
+}
+
+
+/* fonction qui permet de récupéré les event du calendrier sibler */
+async function getEvent(){
+  const startDate = new Date();
+  const endDate = new Date();
+  endDate.setDate(endDate.getDate() + 7);
+
+  const event = await Calendar.getEventsAsync(calendarList,startDate,endDate)
+  console.log(`Here the event since ${startDate} to ${endDate}`)
+  console.log(event);
 }
 
 async function getDefaultCalendarSource() {
@@ -47,6 +70,12 @@ async function deleteExpoCalendars() {
         await Calendar.deleteCalendarAsync(calendar.id);
         console.log(`Deleted calendar with id: ${calendar.id}`);
         deletedCount++;
+      }
+      console.log(calendarList)
+
+      /* vérification pour ajouter seulement le calandrier lier au mail de l'utilisateur mail qui nous intérèsse */
+      if (calendar.ownerAccount == user) {
+        calendarList.push(calendar.id)
       }
     }
     console.log(`Deleted ${deletedCount} calendars.`);
