@@ -3,7 +3,7 @@ import 'react-native-reanimated';
 import * as Calendar from 'expo-calendar';
 import { useEffect } from 'react';
 import { Button, Platform, StyleSheet, Text, View } from 'react-native';
-
+import { AuthContext } from '@/contexts/AuthContext';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
 export const unstable_settings = {
@@ -24,9 +24,11 @@ export default function RootLayout() {
     })();
   }, []);
 
+  // TODO FIX AuthContext usage
   return (
     <View style={styles.container}>
       <Text>Calendar Module Example</Text>
+      <Button title="Sign out" onPress={AuthContext.signOut} />  {/* TODO FIX */}
       <Button title="Create a new calendar" onPress={createCalendar} />
       <Button title="Delete Expo Calendars" onPress={deleteExpoCalendars} />
     </View>
