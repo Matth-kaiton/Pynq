@@ -1,12 +1,13 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
+import { Session, User } from '@supabase/supabase-js';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 
 type AuthContextType = {
   user: User | null;
   session: Session | null;
   signUp: (email: string, password: string) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
+  signInAsGuest: () => Promise<void>;
   signOut: () => Promise<void>;
   loading: boolean;
 };
@@ -16,6 +17,7 @@ export const AuthContext = createContext<AuthContextType>({
   session: null,
   signUp: async () => {},
   signIn: async () => {},
+  signInAsGuest: async () => {},
   signOut: async () => {},
   loading: true,
 });
@@ -54,13 +56,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (error) throw error;
   };
 
+  const signInAsGuest = async () => {
+    // Sign in with a pre-existing guest account
+    // Option 1: Use anonymous sign-in (if enabled in Supabase)
+    const { error } = await supabase.auth.signInAnonymously();
+    if (error) throw error;
+  };
+
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, signUp, signIn, signOut, loading }}>
+    <AuthContext.Provider value={{ user, session, signUp, signIn, signInAsGuest, signOut, loading }}>
       {children}
     </AuthContext.Provider>
   );

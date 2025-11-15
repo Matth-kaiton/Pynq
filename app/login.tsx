@@ -1,16 +1,16 @@
-import { useState } from 'react';
-import { StyleSheet, TextInput, Button, Alert, View } from 'react-native';
-import { useAuth } from '@/contexts/AuthContext';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { useAuth } from '@/contexts/AuthContext';
 import { router } from 'expo-router';
+import { useState } from 'react';
+import { Alert, Button, StyleSheet, TextInput } from 'react-native';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { signIn, signUp } = useAuth();
+  const { signIn, signUp, signInAsGuest } = useAuth();
 
   const handleAuth = async () => {
     if (!email || !password) {
@@ -33,6 +33,18 @@ export default function LoginScreen() {
       setLoading(false);
     }
   };
+
+  const handleGuest = async () => {
+    setLoading(true);
+    try {
+      await signInAsGuest();
+      router.replace('/(tabs)');
+    } catch (error: any) {
+      Alert.alert('Error', error.message);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <ThemedView style={styles.container}>
@@ -63,6 +75,8 @@ export default function LoginScreen() {
         title={isSignUp ? 'Already have an account? Sign In' : "Don't have an account? Sign Up"}
         onPress={() => setIsSignUp(!isSignUp)}
       />
+
+      <Button title="Continue as Guest" onPress={handleGuest} />
     </ThemedView>
   );
 }
