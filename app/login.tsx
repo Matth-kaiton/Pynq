@@ -1,6 +1,6 @@
+import { useAuth } from '@/components/AuthContext';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { useAuth } from '@/contexts/AuthContext';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { Alert, Button, StyleSheet, TextInput } from 'react-native';

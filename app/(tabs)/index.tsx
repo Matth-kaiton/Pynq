@@ -1,126 +1,107 @@
-import { Image } from 'expo-image';
-import { Button, Platform, StyleSheet } from 'react-native';
+import 'react-native-reanimated';
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
-import { useAuth } from '@/contexts/AuthContext';
-import { useEffect } from 'react';
+import { useAuth } from '@/components/AuthContext';
+import * as Calendar from 'expo-calendar';
 import { router } from 'expo-router';
+import { useEffect } from 'react';
+import { Button, Platform, StyleSheet, Text, View } from 'react-native';
 
-export default function HomeScreen() {
-  const { user, signOut, loading } = useAuth();
+async function getDefaultCalendarSource() {
+  const defaultCalendar = await Calendar.getDefaultCalendarAsync();
+  return defaultCalendar.source;
+}
+
+async function deleteExpoCalendars() {
+  try {
+    const calendars = await Calendar.getCalendarsAsync(Calendar.EntityTypes.EVENT);
+    let deletedCount = 0;
+    for (const calendar of calendars) {
+      if (calendar.title === 'Expo Calendar') {
+        await Calendar.deleteCalendarAsync(calendar.id);
+        console.log(`Deleted calendar with id: ${calendar.id}`);
+        deletedCount++;
+      }
+    }
+    console.log(`Deleted ${deletedCount} calendars.`);
+  } catch (err) {
+    console.error('deleteCalendars failed', err);
+  }
+}
+
+async function createCalendar() {
+  try {
+    let source;
+    if (Platform.OS === 'ios') {
+      const defaultCalendar = await Calendar.getDefaultCalendarAsync();
+      source = defaultCalendar?.source ?? { name: 'Expo Calendar', isLocalAccount: true };
+    } else {
+      source = { isLocalAccount: true, name: 'Expo Calendar' };
+    }
+
+    const calendarParams: any = {
+      title: 'Expo Calendar',
+      color: 'blue',
+      entityType: Calendar.EntityTypes.EVENT,
+      name: 'internalCalendarName',
+      source,
+      ownerAccount: 'personal',
+      accessLevel: Calendar.CalendarAccessLevel.OWNER, // required
+    };
+
+    if (Platform.OS === 'ios') {
+      if (source && typeof (source as any).id !== 'undefined') {
+        calendarParams.sourceId = (source as any).id;
+      }
+      calendarParams.ownerAccount = 'personal';
+    }
+
+    const newCalendarID = await Calendar.createCalendarAsync(calendarParams);
+    console.log(`Your new calendar ID is: ${newCalendarID}`);
+  } catch (err) {
+    console.error('createCalendar failed', err);
+  }
+}
+
+export default function CalendarScreen() {
+  const { signOut, user } = useAuth();
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      console.log('User signed out');
+      router.replace('/login');
+    } catch (error) {
+      console.error('Sign out failed', error);
+    }
+  };
 
   useEffect(() => {
-    if (!loading && !user) {
-      router.replace('/login');
-    }
-  }, [user, loading]);
-
-  if (loading) {
-    return (
-      <ThemedView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ThemedText>Loading...</ThemedText>
-      </ThemedView>
-    );
-  }
-
-  if (!user) {
-    return null;
-  }
+    (async () => {
+      const { status } = await Calendar.requestCalendarPermissionsAsync();
+      if (status === 'granted') {
+        const calendars = await Calendar.getCalendarsAsync(Calendar.EntityTypes.EVENT);
+        console.log('Here are all your calendars:');
+        console.log({ calendars });
+      }
+    })();
+  }, []);
 
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      
-      <ThemedView style={styles.stepContainer}>
-        <Button title="Sign Out" onPress={signOut} />
-      </ThemedView>
-      
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
-
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <View style={styles.container}>
+      <Text>Calendar Module Example</Text>
+      <Text>User: {user ? user.email : 'No user signed in'}</Text>
+      <Button title="Sign out" onPress={handleSignOut} />
+      <Button title="Create a new calendar" onPress={createCalendar} />
+      <Button title="Delete Expo Calendars" onPress={deleteExpoCalendars} />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
     alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+    justifyContent: 'space-around',
   },
 });
