@@ -8,12 +8,12 @@
         }
       ]
     ],
-    "name": "test",
-    "slug": "test",
+    "name": "Pynq",
+    "slug": "pynq",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "test",
+    "scheme": "pynq",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
