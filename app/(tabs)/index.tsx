@@ -1,10 +1,12 @@
 import 'react-native-reanimated';
 
 import { useAuth } from '@/components/AuthContext';
+import { getEvent } from '@/servicies/GetCalandar';
 import * as Calendar from 'expo-calendar';
 import { router } from 'expo-router';
 import { useEffect } from 'react';
 import { Button, Platform, StyleSheet, Text, View } from 'react-native';
+
 
 async function getDefaultCalendarSource() {
   const defaultCalendar = await Calendar.getDefaultCalendarAsync();
@@ -69,7 +71,7 @@ export default function CalendarScreen() {
     try {
       await signOut();
       console.log('User signed out');
-      router.replace('/login');
+      router.replace('../login');
     } catch (error) {
       console.error('Sign out failed', error);
     }
@@ -80,8 +82,7 @@ export default function CalendarScreen() {
       const { status } = await Calendar.requestCalendarPermissionsAsync();
       if (status === 'granted') {
         const calendars = await Calendar.getCalendarsAsync(Calendar.EntityTypes.EVENT);
-        console.log('Here are all your calendars:');
-        console.log({ calendars });
+        console.log('Here are all event:');
       }
     })();
   }, []);
@@ -91,6 +92,7 @@ export default function CalendarScreen() {
       <Text>Calendar Module Example</Text>
       <Text>User: {user ? user.email : 'No user signed in'}</Text>
       <Button title="Sign out" onPress={handleSignOut} />
+      <Button title="Get Event" onPress={getEvent}/>
       <Button title="Create a new calendar" onPress={createCalendar} />
       <Button title="Delete Expo Calendars" onPress={deleteExpoCalendars} />
     </View>
