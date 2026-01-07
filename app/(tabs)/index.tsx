@@ -6,6 +6,7 @@ import * as Calendar from 'expo-calendar';
 import { router } from 'expo-router';
 import { useEffect } from 'react';
 import { Button, Platform, StyleSheet, Text, View } from 'react-native';
+import { ShowCalendar } from '@/servicies/big_calendar';
 
 
 async function getDefaultCalendarSource() {
@@ -89,7 +90,7 @@ export default function CalendarScreen() {
 
   return (
     <View style={styles.container}>
-      <Text>Calendar Module Example</Text>
+      <ShowCalendar />
       <Text>User: {user ? user.email : 'No user signed in'}</Text>
       <Button title="Sign out" onPress={handleSignOut} />
       <Button title="Get Event" onPress={getEvent}/>
