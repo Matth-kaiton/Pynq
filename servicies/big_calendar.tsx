@@ -1,35 +1,53 @@
-import { useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { supabase } from "@/lib/supabase";
+import { useEffect, useState } from "react";
+import { Button, StyleSheet, View } from "react-native";
 import { Calendar } from "react-native-big-calendar";
+import { GetRemoteEvents } from "./GetCalandar";
 
-export let event = [
-  {
-    title: "Meeting",
-    start: new Date(2025, 11, 2, 10, 0),
-    end: new Date(2025, 11, 2, 10, 30),
-  },
-  {
-    title: "Test",
-    start: new Date(2026, 0, 28, 10, 0),
-    end: new Date(2026, 0, 28, 11, 30),
-  },
-];
-
-export async function createEvent() {
-  event.push({
-    title: "Nouveau Test " + new Date().getSeconds(),
-    start: new Date(2026, 0, 28, 9, 0),
-    end: new Date(2026, 0, 28, 10, 30),
+export async function registerEvent() {
+  // created_by: int8,
+  // group_id: int8,
+  // created_by: uuid,
+  // members: uuid[],
+  // type: text(max 20),
+  // description: text(max 200),
+  // place: text(max 20),
+  // start_date: timestampz(with time zone),
+  // end_date: timestampz (with time zone),
+  // title: text(max 50),
+  const { error } = await supabase.from("events").insert({
+    title: "Test Event",
+    start_date: new Date(2026, 0, 28, 9, 0).toISOString(),
+    end_date: new Date(2026, 0, 28, 10, 30).toISOString(),
   });
-  console.log("Événement ajouté dans le tableau");
+  console.log(error);
 }
 
 export function ShowCalendar() {
-  const [calendarEvent, setCalendarData] = useState(event);
+  const [calendarEvent, setCalendarData] = useState<any[]>([]);
 
-  function handleRefresh() {
-    createEvent();
-    setCalendarData([...event]);
+  useEffect(() => {
+    // Load remote events when component mounts
+    GetRemoteEvents().then((events) => {
+      setCalendarData(events);
+    });
+  }, []);
+
+  async function handleRefresh() {
+    // Create new local event
+    const newEvent = {
+      title: "Nouveau Test " + new Date().getSeconds(),
+      start: new Date(2026, 0, 28, 9, 0),
+      end: new Date(2026, 0, 28, 10, 30),
+    };
+
+    // Register event to database
+    await registerEvent();
+
+    // Refresh events from remote
+    const updatedEvents = await GetRemoteEvents();
+    setCalendarData(updatedEvents);
+    console.log("Événements mis à jour");
   }
 
   return (
@@ -41,7 +59,7 @@ export function ShowCalendar() {
         swipeEnabled={true}
         onPressEvent={(e) => console.log(e)}
       />
-      {/* <Button title="Create Event" onPress={handleRefresh} /> */}
+      <Button title="Create Event" onPress={handleRefresh} />
     </View>
   );
 }
