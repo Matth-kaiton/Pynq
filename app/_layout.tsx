@@ -1,10 +1,10 @@
-import 'react-native-reanimated';
+import "react-native-reanimated";
 
-import { AuthProvider } from '@/components/AuthContext';
-import { Stack } from 'expo-router';
+import { AuthProvider } from "@/components/AuthContext";
+import { Stack } from "expo-router";
 
 export const unstable_settings = {
-  initialRouteName: '(tabs)',
+  initialRouteName: "(tabs)",
 };
 
 export default function RootLayout() {

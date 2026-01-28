@@ -1,0 +1,39 @@
+{
+  "colors": {
+    "primary": "#F2A900",
+    "primaryContainer": "#FFDDA6",
+
+    "background": "#ffccff",
+    "backgroundLight": "#EEDCFA",
+    "backgroundDark": "#ff99ff",
+
+    "secondary": "#ff4433",
+    "secondaryContainer": "#FF6F61",
+
+    "error": "#FF6B6B",
+
+    "shadow": "#000000"
+  },
+
+  "typography": {
+    "displayLarge": { "fontSize": 57, "fontWeight": "400" },
+    "displayMedium": { "fontSize": 45, "fontWeight": "400" },
+    "displaySmall": { "fontSize": 36, "fontWeight": "400" },
+
+    "headlineLarge": { "fontSize": 32, "fontWeight": "600" },
+    "headlineMedium": { "fontSize": 28, "fontWeight": "600" },
+    "headlineSmall": { "fontSize": 24, "fontWeight": "600" },
+
+    "titleLarge": { "fontSize": 22, "fontWeight": "600" },
+    "titleMedium": { "fontSize": 18, "fontWeight": "500" },
+    "titleSmall": { "fontSize": 16, "fontWeight": "500" },
+
+    "bodyLarge": { "fontSize": 16, "fontWeight": "400" },
+    "bodyMedium": { "fontSize": 14, "fontWeight": "400" },
+    "bodySmall": { "fontSize": 12, "fontWeight": "400" },
+
+    "labelLarge": { "fontSize": 14, "fontWeight": "600" },
+    "labelMedium": { "fontSize": 12, "fontWeight": "500" },
+    "labelSmall": { "fontSize": 11, "fontWeight": "500" }
+  }
+}
