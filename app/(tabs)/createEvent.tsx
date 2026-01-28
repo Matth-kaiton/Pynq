@@ -7,21 +7,40 @@ import { Alert, Button, StyleSheet, TextInput } from "react-native";
 
 export default function CreateEvent() {
   const [text, setText] = useState(String);
-  const [year, setYear] = useState(Number);
-  const [month, setMonth] = useState(Number);
-  const [day, setDay] = useState(Number);
+
+  const [startYear, setStartYear] = useState(Number);
+  const [endYear, setEndYear] = useState(Number);
+
+  const [startMonth, setStartMonth] = useState(Number);
+  const [endMonth, setEndMonth] = useState(Number);
+
+  const [startDay, setStartDay] = useState(Number);
+  const [endDay, setEndDay] = useState(Number);
+
   const [startT, setStartT] = useState(Number);
-  const [startTM, setStartTM] = useState(Number);
   const [endT, setEndT] = useState(Number);
+
+  const [startTM, setStartTM] = useState(Number);
   const [endTM, setEndTM] = useState(Number);
 
   async function createEvent() {
     event.push({
       title: text,
-      start: new Date(year, month - 1, day, startT, startTM),
-      end: new Date(year, month - 1, day, endT, endTM),
+      start: new Date(startYear, startMonth - 1, startDay, startT, startTM),
+      end: new Date(endYear, endMonth - 1, endDay, endT, endTM),
     });
-    console.log(year, month, day, startT, startTM, endT, endTM);
+    console.log(
+      startYear,
+      endYear,
+      startMonth,
+      endMonth,
+      startDay,
+      endDay,
+      startT,
+      startTM,
+      endT,
+      endTM,
+    );
     console.log("Événement ajouté dans le tableau");
   }
 
@@ -44,25 +63,49 @@ export default function CreateEvent() {
 
       <TextInput
         style={styles.input}
-        value={year}
-        onChangeText={setYear}
-        placeholder="Entrez une année..."
+        value={startYear}
+        onChangeText={setStartYear}
+        placeholder="Entrez une année de départ..."
         keyboardType="numeric"
       />
 
       <TextInput
         style={styles.input}
-        value={month}
-        onChangeText={setMonth}
-        placeholder="Entrez un mois..."
+        value={endYear}
+        onChangeText={setEndYear}
+        placeholder="Entrez une année de fin..."
         keyboardType="numeric"
       />
 
       <TextInput
         style={styles.input}
-        value={day}
-        onChangeText={setDay}
-        placeholder="Entrez une journée..."
+        value={startMonth}
+        onChangeText={setStartMonth}
+        placeholder="Entrez un mois de départ..."
+        keyboardType="numeric"
+      />
+
+      <TextInput
+        style={styles.input}
+        value={endMonth}
+        onChangeText={setEndMonth}
+        placeholder="Entrez un mois de fin..."
+        keyboardType="numeric"
+      />
+
+      <TextInput
+        style={styles.input}
+        value={startDay}
+        onChangeText={setStartDay}
+        placeholder="Entrez une journée de départ..."
+        keyboardType="numeric"
+      />
+
+      <TextInput
+        style={styles.input}
+        value={endDay}
+        onChangeText={setEndDay}
+        placeholder="Entrez une journée de fin..."
         keyboardType="numeric"
       />
 
