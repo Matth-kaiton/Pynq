@@ -1,107 +1,55 @@
+import { useState } from "react";
+import { StyleSheet, View } from "react-native";
 import { Calendar } from "react-native-big-calendar";
-import { StyleSheet, View, Animated, PanResponder } from "react-native";
-import { use, useEffect, useRef } from "react";
 
-const events = [
+export let event = [
   {
     title: "Meeting",
     start: new Date(2025, 11, 2, 10, 0),
     end: new Date(2025, 11, 2, 10, 30),
   },
   {
-    title: "Coffee break",
-    start: new Date(2025, 11, 3, 0, 0),
-    end: new Date(2026, 11, 12, 0, 0),
+    title: "Test",
+    start: new Date(2026, 0, 28, 10, 0),
+    end: new Date(2026, 0, 28, 11, 30),
   },
-  {
-    title: "Lunch",
-    start: new Date(2025, 11, 5, 0, 0),
-    end: new Date(2025, 11, 5, 0, 0),
-  }
 ];
 
+export async function createEvent() {
+  event.push({
+    title: "Nouveau Test " + new Date().getSeconds(),
+    start: new Date(2026, 0, 28, 9, 0),
+    end: new Date(2026, 0, 28, 10, 30),
+  });
+  console.log("Événement ajouté dans le tableau");
+}
+
 export function ShowCalendar() {
+  const [calendarEvent, setCalendarData] = useState(event);
+
+  function handleRefresh() {
+    createEvent();
+    setCalendarData([...event]);
+  }
+
   return (
     <View style={styles.container}>
-      <Calendar events={events} height={600} mode="month" swipeEnabled={true} onPressEvent={(e) => console.log(e)} />
+      <Calendar
+        events={calendarEvent}
+        height={600}
+        mode="3days"
+        swipeEnabled={true}
+        onPressEvent={(e) => console.log(e)}
+      />
+      {/* <Button title="Create Event" onPress={handleRefresh} /> */}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    display: "flex",
     flex: 1,
     width: "100%",
     paddingTop: 50,
   },
 });
-
-export default function SwipeCard() {
-  const position = useRef(new Animated.ValueXY()).current;
-
-  const panResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-
-      onPanResponderMove: (evt, gestureState) => {
-        position.setValue({ x: gestureState.dx, y: 0 });
-      },
-
-      onPanResponderRelease: (evt, gestureState) => {
-        // si swipé assez loin, on complète le swipe
-        if (gestureState.dx > 120) {
-          Animated.timing(position, {
-            toValue: { x: 500, y: 0 },
-            duration: 200,
-            useNativeDriver: true,
-          }).start();
-        }
-        // swipe vers la gauche
-        else if (gestureState.dx < -120) {
-          Animated.timing(position, {
-            toValue: { x: -500, y: 0 },
-            duration: 200,
-            useNativeDriver: true,
-          }).start();
-        }
-        // sinon, retour au centre
-        else {
-          Animated.spring(position, {
-            toValue: { x: 0, y: 0 },
-            friction: 5,
-            useNativeDriver: true,
-          }).start();
-        }
-      },
-    })
-  ).current;
-
-  return (
-    <View style={styles.container}>
-      <Animated.View
-        {...panResponder.panHandlers}
-        style={[
-          styles.card,
-          {
-            transform: [{ translateX: position.x }],
-          },
-        ]}
-      />
-    </View>
-  );
-}
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     alignItems: "center",
-//     justifyContent: "center",
-//   },
-//   card: {
-//     width: 250,
-//     height: 150,
-//     backgroundColor: "#4a90e2",
-//     borderRadius: 15,
-//   },
-// });
