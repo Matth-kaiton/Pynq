@@ -3,7 +3,14 @@ import { ThemedView } from "@/components/themed-view";
 import { event } from "@/servicies/big_calendar";
 import { router } from "expo-router";
 import React, { useState } from "react";
-import { Alert, Button, StyleSheet, TextInput } from "react-native";
+import {
+    Alert,
+    ScrollView,
+    StyleSheet,
+    TextInput,
+    TouchableOpacity,
+    View,
+} from "react-native";
 
 export default function CreateEvent() {
   const [text, setText] = useState(String);
@@ -51,115 +58,189 @@ export default function CreateEvent() {
   };
 
   return (
-    <ThemedView style={styles.container}>
-      <ThemedText type="defaultSemiBold">Nom de l'événement :</ThemedText>
+    <ScrollView
+      style={{ backgroundColor: "#fff" }}
+      contentContainerStyle={styles.scrollContainer}
+    >
+      <ThemedView style={styles.container}>
+        <ThemedText style={styles.mainTitle}>Nouvel Événement</ThemedText>
 
-      <TextInput
-        style={styles.input}
-        value={text}
-        onChangeText={setText}
-        placeholder="Entrez un nom d'évènement..."
-      />
+        <View style={styles.inputGroup}>
+          <ThemedText style={styles.label}>Titre</ThemedText>
+          <TextInput
+            style={styles.inputFull}
+            value={text}
+            onChangeText={setText}
+            placeholder="Réunion, Sport, Sortie..."
+            placeholderTextColor="#999"
+          />
+        </View>
 
-      <TextInput
-        style={styles.input}
-        value={startYear}
-        onChangeText={setStartYear}
-        placeholder="Entrez une année de départ..."
-        keyboardType="numeric"
-      />
+        <View style={styles.card}>
+          <ThemedText style={styles.cardTitle}>DÉBUT</ThemedText>
+          <View style={styles.row}>
+            <TextInput
+              style={[styles.input, { flex: 1.5 }]}
+              placeholder="JJ"
+              keyboardType="numeric"
+              maxLength={2}
+              onChangeText={setStartDay}
+            />
+            <TextInput
+              style={[styles.input, { flex: 1.5 }]}
+              placeholder="MM"
+              keyboardType="numeric"
+              maxLength={2}
+              onChangeText={setStartMonth}
+            />
+            <TextInput
+              style={[styles.input, { flex: 2 }]}
+              placeholder="AAAA"
+              keyboardType="numeric"
+              maxLength={4}
+              onChangeText={setStartYear}
+            />
+          </View>
+          <View style={styles.row}>
+            <TextInput
+              style={styles.input}
+              placeholder="Heure"
+              keyboardType="numeric"
+              maxLength={2}
+              onChangeText={setStartT}
+            />
+            <ThemedText style={styles.separator}>:</ThemedText>
+            <TextInput
+              style={styles.input}
+              placeholder="Min"
+              keyboardType="numeric"
+              maxLength={2}
+              onChangeText={setStartTM}
+            />
+          </View>
+        </View>
 
-      <TextInput
-        style={styles.input}
-        value={endYear}
-        onChangeText={setEndYear}
-        placeholder="Entrez une année de fin..."
-        keyboardType="numeric"
-      />
+        <View style={[styles.card, { borderColor: "#E8F0FE" }]}>
+          <ThemedText style={[styles.cardTitle, { color: "#1a73e8" }]}>
+            FIN
+          </ThemedText>
+          <View style={styles.row}>
+            <TextInput
+              style={[styles.input, { flex: 1.5 }]}
+              placeholder="JJ"
+              keyboardType="numeric"
+              maxLength={2}
+              onChangeText={setEndDay}
+            />
+            <TextInput
+              style={[styles.input, { flex: 1.5 }]}
+              placeholder="MM"
+              keyboardType="numeric"
+              maxLength={2}
+              onChangeText={setEndMonth}
+            />
+            <TextInput
+              style={[styles.input, { flex: 2 }]}
+              placeholder="AAAA"
+              keyboardType="numeric"
+              maxLength={4}
+              onChangeText={setEndYear}
+            />
+          </View>
+          <View style={styles.row}>
+            <TextInput
+              style={styles.input}
+              placeholder="Heure"
+              keyboardType="numeric"
+              maxLength={2}
+              onChangeText={setEndT}
+            />
+            <ThemedText style={styles.separator}>:</ThemedText>
+            <TextInput
+              style={styles.input}
+              placeholder="Min"
+              keyboardType="numeric"
+              maxLength={2}
+              onChangeText={setEndTM}
+            />
+          </View>
+        </View>
 
-      <TextInput
-        style={styles.input}
-        value={startMonth}
-        onChangeText={setStartMonth}
-        placeholder="Entrez un mois de départ..."
-        keyboardType="numeric"
-      />
-
-      <TextInput
-        style={styles.input}
-        value={endMonth}
-        onChangeText={setEndMonth}
-        placeholder="Entrez un mois de fin..."
-        keyboardType="numeric"
-      />
-
-      <TextInput
-        style={styles.input}
-        value={startDay}
-        onChangeText={setStartDay}
-        placeholder="Entrez une journée de départ..."
-        keyboardType="numeric"
-      />
-
-      <TextInput
-        style={styles.input}
-        value={endDay}
-        onChangeText={setEndDay}
-        placeholder="Entrez une journée de fin..."
-        keyboardType="numeric"
-      />
-
-      <TextInput
-        style={styles.input}
-        value={startT}
-        onChangeText={setStartT}
-        placeholder="Entrez une heure de départ..."
-        keyboardType="numeric"
-      />
-
-      <TextInput
-        style={styles.input}
-        value={startTM}
-        onChangeText={setStartTM}
-        placeholder="Entrez les minutes de départ..."
-        keyboardType="numeric"
-      />
-
-      <TextInput
-        style={styles.input}
-        value={endT}
-        onChangeText={setEndT}
-        placeholder="Entrez une heure de fin..."
-        keyboardType="numeric"
-      />
-
-      <TextInput
-        style={styles.input}
-        value={endTM}
-        onChangeText={setEndTM}
-        placeholder="Entrez les minutes de fin..."
-        keyboardType="numeric"
-      />
-
-      <Button title="Submit" onPress={handleSubmit} />
-    </ThemedView>
+        <TouchableOpacity style={styles.submitBtn} onPress={handleSubmit}>
+          <ThemedText style={styles.submitBtnText}>
+            Enregistrer l'événement
+          </ThemedText>
+        </TouchableOpacity>
+      </ThemedView>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    justifyContent: "center",
+  scrollContainer: { paddingBottom: 40 },
+  container: { flex: 1, padding: 20, backgroundColor: "#fff" },
+  mainTitle: {
+    fontSize: 28,
+    fontWeight: "bold",
+    marginBottom: 25,
+    marginTop: 20,
+    color: "#1a1a1a",
+  },
+  label: { fontSize: 14, color: "#666", marginBottom: 8, fontWeight: "600" },
+  inputGroup: { marginBottom: 20 },
+  inputFull: {
+    height: 50,
+    backgroundColor: "#f5f5f5",
+    borderRadius: 12,
+    paddingHorizontal: 15,
+    fontSize: 16,
+    borderWidth: 1,
+    borderColor: "#eee",
+  },
+  card: {
+    backgroundColor: "#fff",
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: "#f0f0f0",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  cardTitle: {
+    fontSize: 12,
+    fontWeight: "800",
+    color: "#666",
+    marginBottom: 15,
+    letterSpacing: 1,
+  },
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    marginBottom: 12,
   },
   input: {
-    height: 40,
-    borderWidth: 1,
-    borderColor: "#ccc",
+    flex: 1,
+    height: 45,
+    backgroundColor: "#f9f9f9",
     borderRadius: 8,
-    paddingHorizontal: 10,
-    marginVertical: 15,
-    color: "#000",
-    backgroundColor: "#fff",
+    textAlign: "center",
+    fontSize: 15,
+    borderWidth: 1,
+    borderColor: "#eee",
   },
+  separator: { fontSize: 20, fontWeight: "bold", color: "#ccc" },
+  submitBtn: {
+    backgroundColor: "#000",
+    height: 55,
+    borderRadius: 14,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 10,
+  },
+  submitBtnText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
 });
