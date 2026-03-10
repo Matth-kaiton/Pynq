@@ -1,100 +1,72 @@
+import { supabase } from "@/lib/supabase";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { ActivityIndicator, StyleSheet, View } from "react-native";
 import { Calendar } from "react-native-big-calendar";
+import { getRemoteEvents } from "./GetCalandar";
 
-export let event = [
-  {
-    title: "",
-    start: new Date(),
-    end: new Date(),
-  },
-];
+export async function registerEvent() {
+  // 1. Récupérer l'ID et le groupe pour l'insertion (Minimum requis)
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const { data: groups } = await supabase
+    .from("groups")
+    .select("id")
+    .contains("members", [user?.id]);
+
+  if (!user || !groups?.[0]) return;
+}
 
 export function ShowCalendar() {
-  const [calendarEvent, setCalendarData] = useState(event);
+  const [calendarEvents, setCalendarEvents] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useFocusEffect(
     useCallback(() => {
-      setCalendarData([...event]);
+      let isActive = true;
+
+      const loadData = async () => {
+        setLoading(true);
+        const data = await getRemoteEvents();
+        if (isActive) {
+          setCalendarEvents(data);
+          setLoading(false);
+        }
+      };
+
+      loadData();
+      return () => {
+        isActive = false;
+      };
     }, []),
   );
+
+  if (loading) {
+    return (
+      <View style={styles.loader}>
+        <ActivityIndicator size="large" color="#000" />
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <Calendar
-        events={calendarEvent}
+        events={calendarEvents}
         height={600}
         mode="3days"
         swipeEnabled={true}
-        onPressEvent={(e) => console.log(e)}
+        onPressEvent={(e) => console.log("Event:", e)}
       />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    display: "flex",
-    flex: 1,
-    width: "100%",
-    paddingTop: 50,
-  },
+  container: { flex: 1, paddingTop: 50, backgroundColor: "#fff" },
+  loader: { flex: 1, justifyContent: "center", alignItems: "center" },
 });
-
-export default function SwipeCard() {
-  const position = useRef(new Animated.ValueXY()).current;
-
-  const panResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-
-      onPanResponderMove: (evt, gestureState) => {
-        position.setValue({ x: gestureState.dx, y: 0 });
-      },
-
-      onPanResponderRelease: (evt, gestureState) => {
-        // si swipé assez loin, on complète le swipe
-        if (gestureState.dx > 120) {
-          Animated.timing(position, {
-            toValue: { x: 500, y: 0 },
-            duration: 200,
-            useNativeDriver: true,
-          }).start();
-        }
-        // swipe vers la gauche
-        else if (gestureState.dx < -120) {
-          Animated.timing(position, {
-            toValue: { x: -500, y: 0 },
-            duration: 200,
-            useNativeDriver: true,
-          }).start();
-        }
-        // sinon, retour au centre
-        else {
-          Animated.spring(position, {
-            toValue: { x: 0, y: 0 },
-            friction: 5,
-            useNativeDriver: true,
-          }).start();
-        }
-      },
-    })
-  ).current;
-
-  return (
-    <View style={styles.container}>
-      <Animated.View
-        {...panResponder.panHandlers}
-        style={[
-          styles.card,
-          {
-            transform: [{ translateX: position.x }],
-          },
-        ]}
-      />
-    </View>
-  );
-}
 
 // const styles = StyleSheet.create({
 //   container: {
