@@ -1,19 +1,32 @@
 import { supabase } from "@/lib/supabase";
 
-export async function registerEvent(title: string, start: Date, end: Date) {
+export async function getUserGroups() {
   try {
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    if (!user) throw new Error("Utilisateur non authentifié");
+    if (!user) return [];
 
-    // 1. Récupérer le groupe
-    const { data: groups, error: groupError } = await supabase
+    const { data: groups, error } = await supabase
       .from("groups")
-      .select("id")
+      .select("id, name, description")
       .contains("members", [user.id]);
 
-    if (groupError || !groups || groups.length === 0) {
+    if (error || !groups) return [];
+    return groups;
+  } catch (error) {
+    console.error("Erreur getUserGroups:", error);
+    return [];
+  }
+}
+
+export async function registerEvent(title: string, start: Date, end: Date) {
+  try {
+
+    // 1. Récupérer les groupes
+    const groups = await getUserGroups();
+
+    if (/*groupError ||*/ !groups || groups.length === 0) {
       throw new Error("Aucun groupe trouvé");
     }
 
@@ -37,15 +50,7 @@ export async function registerEvent(title: string, start: Date, end: Date) {
 
 export async function getRemoteEvents() {
   try {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) return [];
-
-    const { data: groups } = await supabase
-      .from("groups")
-      .select("id")
-      .contains("members", [user.id]);
+    const groups = await getUserGroups();
 
     if (!groups?.[0]) return [];
 
