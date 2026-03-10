@@ -67,17 +67,3 @@ const styles = StyleSheet.create({
   container: { flex: 1, paddingTop: 50, backgroundColor: "#fff" },
   loader: { flex: 1, justifyContent: "center", alignItems: "center" },
 });
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     alignItems: "center",
-//     justifyContent: "center",
-//   },
-//   card: {
-//     width: 250,
-//     height: 150,
-//     backgroundColor: "#4a90e2",
-//     borderRadius: 15,
-//   },
-// });
