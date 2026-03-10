@@ -69,10 +69,6 @@ async function createCalendar() {
   }
 }
 
-export async function CreateEvent() {
-  router.replace("/(tabs)/createEvent");
-}
-
 export default function CalendarScreen() {
   const { signOut, user } = useAuth();
 
@@ -104,7 +100,6 @@ export default function CalendarScreen() {
       <Text>User: {user ? user.email : "No user signed in"}</Text>
       <Button title="Sign out" onPress={handleSignOut} />
       <Button title="Get Event" onPress={getEvent} />
-      <Button title="Create Event" onPress={CreateEvent} />
       <Button title="Create a new calendar" onPress={createCalendar} />
       <Button title="Delete Expo Calendars" onPress={deleteExpoCalendars} />
     </View>

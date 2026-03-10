@@ -1,17 +1,9 @@
 import { supabase } from "@/lib/supabase";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { ActivityIndicator, StyleSheet, View } from "react-native";
 import { Calendar } from "react-native-big-calendar";
-import { GetRemoteEvents } from "./GetCalandar";
-
-export let event = [
-  {
-    title: "",
-    start: new Date(),
-    end: new Date(),
-  },
-];
+import { getRemoteEvents } from "./GetCalandar";
 
 export async function registerEvent() {
   // 1. Récupérer l'ID et le groupe pour l'insertion (Minimum requis)
@@ -27,32 +19,51 @@ export async function registerEvent() {
 }
 
 export function ShowCalendar() {
-  const [calendarEvent, setCalendarData] = useState<any[]>([]);
+  const [calendarEvents, setCalendarEvents] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useFocusEffect(
     useCallback(() => {
-      registerEvent();
-      const events = GetRemoteEvents();
-      setCalendarData([...events]);
+      let isActive = true;
+
+      const loadData = async () => {
+        setLoading(true);
+        const data = await getRemoteEvents();
+        if (isActive) {
+          setCalendarEvents(data);
+          setLoading(false);
+        }
+      };
+
+      loadData();
+      return () => {
+        isActive = false;
+      };
     }, []),
   );
+
+  if (loading) {
+    return (
+      <View style={styles.loader}>
+        <ActivityIndicator size="large" color="#000" />
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <Calendar
-        events={calendarEvent}
+        events={calendarEvents}
         height={600}
         mode="3days"
         swipeEnabled={true}
-        onPressEvent={(e) => console.log(e)}
+        onPressEvent={(e) => console.log("Event:", e)}
       />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    width: "100%",
-    paddingTop: 50,
-  },
+  container: { flex: 1, paddingTop: 50, backgroundColor: "#fff" },
+  loader: { flex: 1, justifyContent: "center", alignItems: "center" },
 });
