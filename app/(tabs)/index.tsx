@@ -1,12 +1,13 @@
-import "react-native-reanimated";
+import 'react-native-reanimated';
 
-import { useAuth } from "@/components/AuthContext";
-import { ShowCalendar } from "@/servicies/big_calendar";
-import { getEvent } from "@/servicies/GetCalandar";
-import * as Calendar from "expo-calendar";
-import { router } from "expo-router";
-import { useEffect } from "react";
-import { Button, Platform, StyleSheet, Text, View } from "react-native";
+import { useAuth } from '@/components/AuthContext';
+import { getEvent } from '@/servicies/GetCalandar';
+import * as Calendar from 'expo-calendar';
+import { router } from 'expo-router';
+import { useEffect } from 'react';
+import { Button, Platform, StyleSheet, Text, View } from 'react-native';
+import { ShowCalendar } from '@/servicies/big_calendar';
+
 
 async function getDefaultCalendarSource() {
   const defaultCalendar = await Calendar.getDefaultCalendarAsync();
@@ -15,12 +16,10 @@ async function getDefaultCalendarSource() {
 
 async function deleteExpoCalendars() {
   try {
-    const calendars = await Calendar.getCalendarsAsync(
-      Calendar.EntityTypes.EVENT,
-    );
+    const calendars = await Calendar.getCalendarsAsync(Calendar.EntityTypes.EVENT);
     let deletedCount = 0;
     for (const calendar of calendars) {
-      if (calendar.title === "Expo Calendar") {
+      if (calendar.title === 'Expo Calendar') {
         await Calendar.deleteCalendarAsync(calendar.id);
         console.log(`Deleted calendar with id: ${calendar.id}`);
         deletedCount++;
@@ -28,49 +27,42 @@ async function deleteExpoCalendars() {
     }
     console.log(`Deleted ${deletedCount} calendars.`);
   } catch (err) {
-    console.error("deleteCalendars failed", err);
+    console.error('deleteCalendars failed', err);
   }
 }
 
 async function createCalendar() {
   try {
     let source;
-    if (Platform.OS === "ios") {
+    if (Platform.OS === 'ios') {
       const defaultCalendar = await Calendar.getDefaultCalendarAsync();
-      source = defaultCalendar?.source ?? {
-        name: "Expo Calendar",
-        isLocalAccount: true,
-      };
+      source = defaultCalendar?.source ?? { name: 'Expo Calendar', isLocalAccount: true };
     } else {
-      source = { isLocalAccount: true, name: "Expo Calendar" };
+      source = { isLocalAccount: true, name: 'Expo Calendar' };
     }
 
     const calendarParams: any = {
-      title: "Expo Calendar",
-      color: "blue",
+      title: 'Expo Calendar',
+      color: 'blue',
       entityType: Calendar.EntityTypes.EVENT,
-      name: "internalCalendarName",
+      name: 'internalCalendarName',
       source,
-      ownerAccount: "personal",
+      ownerAccount: 'personal',
       accessLevel: Calendar.CalendarAccessLevel.OWNER, // required
     };
 
-    if (Platform.OS === "ios") {
-      if (source && typeof (source as any).id !== "undefined") {
+    if (Platform.OS === 'ios') {
+      if (source && typeof (source as any).id !== 'undefined') {
         calendarParams.sourceId = (source as any).id;
       }
-      calendarParams.ownerAccount = "personal";
+      calendarParams.ownerAccount = 'personal';
     }
 
     const newCalendarID = await Calendar.createCalendarAsync(calendarParams);
     console.log(`Your new calendar ID is: ${newCalendarID}`);
   } catch (err) {
-    console.error("createCalendar failed", err);
+    console.error('createCalendar failed', err);
   }
-}
-
-export async function CreateEvent() {
-  router.replace("/(tabs)/createEvent");
 }
 
 export default function CalendarScreen() {
@@ -79,21 +71,19 @@ export default function CalendarScreen() {
   const handleSignOut = async () => {
     try {
       await signOut();
-      console.log("User signed out");
-      router.replace("../login");
+      console.log('User signed out');
+      router.replace('../login');
     } catch (error) {
-      console.error("Sign out failed", error);
+      console.error('Sign out failed', error);
     }
   };
 
   useEffect(() => {
     (async () => {
       const { status } = await Calendar.requestCalendarPermissionsAsync();
-      if (status === "granted") {
-        const calendars = await Calendar.getCalendarsAsync(
-          Calendar.EntityTypes.EVENT,
-        );
-        console.log("Here are all event:");
+      if (status === 'granted') {
+        const calendars = await Calendar.getCalendarsAsync(Calendar.EntityTypes.EVENT);
+        console.log('Here are all event:');
       }
     })();
   }, []);
@@ -101,10 +91,9 @@ export default function CalendarScreen() {
   return (
     <View style={styles.container}>
       <ShowCalendar />
-      <Text>User: {user ? user.email : "No user signed in"}</Text>
+      <Text>User: {user ? user.email : 'No user signed in'}</Text>
       <Button title="Sign out" onPress={handleSignOut} />
-      <Button title="Get Event" onPress={getEvent} />
-      <Button title="Create Event" onPress={CreateEvent} />
+      <Button title="Get Event" onPress={getEvent}/>
       <Button title="Create a new calendar" onPress={createCalendar} />
       <Button title="Delete Expo Calendars" onPress={deleteExpoCalendars} />
     </View>
@@ -114,8 +103,8 @@ export default function CalendarScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "space-around",
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'space-around',
   },
 });
