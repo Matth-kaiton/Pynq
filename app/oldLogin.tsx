@@ -1,20 +1,20 @@
-import { useAuth } from '@/components/AuthContext';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { router } from 'expo-router';
-import { useState } from 'react';
-import { Alert, Button, StyleSheet, TextInput } from 'react-native';
+import { useAuth } from "@/components/AuthContext";
+import { ThemedText } from "@/components/themed-text";
+import { ThemedView } from "@/components/themed-view";
+import { router } from "expo-router";
+import { useState } from "react";
+import { Alert, Button, StyleSheet, TextInput } from "react-native";
 
-export default function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+export default function LoginScreen() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
   const { signIn, signUp, signInAsGuest } = useAuth();
 
   const handleAuth = async () => {
     if (!email || !password) {
-      Alert.alert('Error', 'Please fill in all fields');
+      Alert.alert("Error", "Please fill in all fields");
       return;
     }
 
@@ -22,13 +22,13 @@ export default function Login() {
     try {
       if (isSignUp) {
         await signUp(email, password);
-        Alert.alert('Success', 'Check your email to confirm your account!');
+        Alert.alert("Success", "Check your email to confirm your account!");
       } else {
         await signIn(email, password);
-        router.replace('/(tabs)');
+        router.replace("/(tabs)");
       }
     } catch (error: any) {
-      Alert.alert('Error', error.message);
+      Alert.alert("Error", error.message);
     } finally {
       setLoading(false);
     }
@@ -38,18 +38,18 @@ export default function Login() {
     setLoading(true);
     try {
       await signInAsGuest();
-      router.replace('/(tabs)');
+      router.replace("/(tabs)");
     } catch (error: any) {
-      Alert.alert('Error', error.message);
+      Alert.alert("Error", error.message);
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   return (
     <ThemedView style={styles.container}>
       <ThemedText type="title" style={styles.title}>
-        {isSignUp ? 'Sign Up' : 'Sign In'}
+        {isSignUp ? "Sign Up" : "Sign In"}
       </ThemedText>
 
       <TextInput
@@ -69,10 +69,18 @@ export default function Login() {
         secureTextEntry
       />
 
-      <Button title={loading ? 'Loading...' : isSignUp ? 'Sign Up' : 'Sign In'} onPress={handleAuth} disabled={loading} />
+      <Button
+        title={loading ? "Loading..." : isSignUp ? "Sign Up" : "Sign In"}
+        onPress={handleAuth}
+        disabled={loading}
+      />
 
       <Button
-        title={isSignUp ? 'Already have an account? Sign In' : "Don't have an account? Sign Up"}
+        title={
+          isSignUp
+            ? "Already have an account? Sign In"
+            : "Don't have an account? Sign Up"
+        }
         onPress={() => setIsSignUp(!isSignUp)}
       />
 
@@ -85,18 +93,18 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   title: {
     marginBottom: 30,
-    textAlign: 'center',
+    textAlign: "center",
   },
   input: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     padding: 15,
     borderRadius: 8,
     marginBottom: 15,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
   },
 });

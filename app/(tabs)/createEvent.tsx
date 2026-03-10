@@ -1,15 +1,15 @@
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { event } from "@/servicies/big_calendar";
+import { styles } from "@/style/style";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
-    Alert,
-    ScrollView,
-    StyleSheet,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  ScrollView,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 export default function CreateEvent() {
@@ -63,12 +63,14 @@ export default function CreateEvent() {
       contentContainerStyle={styles.scrollContainer}
     >
       <ThemedView style={styles.container}>
-        <ThemedText style={styles.mainTitle}>Nouvel Événement</ThemedText>
+        <ThemedText type="title" style={styles.title}>
+          Nouvel Événement
+        </ThemedText>
 
         <View style={styles.inputGroup}>
           <ThemedText style={styles.label}>Titre</ThemedText>
           <TextInput
-            style={styles.inputFull}
+            style={styles.input}
             value={text}
             onChangeText={setText}
             placeholder="Réunion, Sport, Sortie..."
@@ -77,7 +79,7 @@ export default function CreateEvent() {
         </View>
 
         <View style={styles.card}>
-          <ThemedText style={styles.cardTitle}>DÉBUT</ThemedText>
+          <ThemedText style={styles.label}>DÉBUT</ThemedText>
           <View style={styles.row}>
             <TextInput
               style={[styles.input, { flex: 1.5 }]}
@@ -120,10 +122,8 @@ export default function CreateEvent() {
           </View>
         </View>
 
-        <View style={[styles.card, { borderColor: "#E8F0FE" }]}>
-          <ThemedText style={[styles.cardTitle, { color: "#1a73e8" }]}>
-            FIN
-          </ThemedText>
+        <View style={styles.card}>
+          <ThemedText style={styles.label}>FIN</ThemedText>
           <View style={styles.row}>
             <TextInput
               style={[styles.input, { flex: 1.5 }]}
@@ -166,81 +166,79 @@ export default function CreateEvent() {
           </View>
         </View>
 
-        <TouchableOpacity style={styles.submitBtn} onPress={handleSubmit}>
-          <ThemedText style={styles.submitBtnText}>
-            Enregistrer l'événement
-          </ThemedText>
+        <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+          <ThemedText style={styles.title}>Enregistrer l'événement</ThemedText>
         </TouchableOpacity>
       </ThemedView>
     </ScrollView>
   );
 }
 
-const styles = StyleSheet.create({
-  scrollContainer: { paddingBottom: 40 },
-  container: { flex: 1, padding: 20, backgroundColor: "#fff" },
-  mainTitle: {
-    fontSize: 28,
-    fontWeight: "bold",
-    marginBottom: 25,
-    marginTop: 20,
-    color: "#1a1a1a",
-  },
-  label: { fontSize: 14, color: "#666", marginBottom: 8, fontWeight: "600" },
-  inputGroup: { marginBottom: 20 },
-  inputFull: {
-    height: 50,
-    backgroundColor: "#f5f5f5",
-    borderRadius: 12,
-    paddingHorizontal: 15,
-    fontSize: 16,
-    borderWidth: 1,
-    borderColor: "#eee",
-  },
-  card: {
-    backgroundColor: "#fff",
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 20,
-    borderWidth: 1,
-    borderColor: "#f0f0f0",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  cardTitle: {
-    fontSize: 12,
-    fontWeight: "800",
-    color: "#666",
-    marginBottom: 15,
-    letterSpacing: 1,
-  },
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-    marginBottom: 12,
-  },
-  input: {
-    flex: 1,
-    height: 45,
-    backgroundColor: "#f9f9f9",
-    borderRadius: 8,
-    textAlign: "center",
-    fontSize: 15,
-    borderWidth: 1,
-    borderColor: "#eee",
-  },
-  separator: { fontSize: 20, fontWeight: "bold", color: "#ccc" },
-  submitBtn: {
-    backgroundColor: "#000",
-    height: 55,
-    borderRadius: 14,
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 10,
-  },
-  submitBtnText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
-});
+// const styles = StyleSheet.create({
+//   scrollContainer: { paddingBottom: 40 },
+//   container: { flex: 1, padding: 20, backgroundColor: "#fff" },
+//   mainTitle: {
+//     fontSize: 28,
+//     fontWeight: "bold",
+//     marginBottom: 25,
+//     marginTop: 20,
+//     color: "#1a1a1a",
+//   },
+//   label: { fontSize: 14, color: "#666", marginBottom: 8, fontWeight: "600" },
+//   inputGroup: { marginBottom: 20 },
+//   inputFull: {
+//     height: 50,
+//     backgroundColor: "#f5f5f5",
+//     borderRadius: 12,
+//     paddingHorizontal: 15,
+//     fontSize: 16,
+//     borderWidth: 1,
+//     borderColor: "#eee",
+//   },
+//   card: {
+//     backgroundColor: "#fff",
+//     borderRadius: 16,
+//     padding: 16,
+//     marginBottom: 20,
+//     borderWidth: 1,
+//     borderColor: "#f0f0f0",
+//     shadowColor: "#000",
+//     shadowOffset: { width: 0, height: 2 },
+//     shadowOpacity: 0.05,
+//     shadowRadius: 8,
+//     elevation: 2,
+//   },
+//   cardTitle: {
+//     fontSize: 12,
+//     fontWeight: "800",
+//     color: "#666",
+//     marginBottom: 15,
+//     letterSpacing: 1,
+//   },
+//   row: {
+//     flexDirection: "row",
+//     alignItems: "center",
+//     gap: 10,
+//     marginBottom: 12,
+//   },
+//   input: {
+//     flex: 1,
+//     height: 45,
+//     backgroundColor: "#f9f9f9",
+//     borderRadius: 8,
+//     textAlign: "center",
+//     fontSize: 15,
+//     borderWidth: 1,
+//     borderColor: "#eee",
+//   },
+//   separator: { fontSize: 20, fontWeight: "bold", color: "#ccc" },
+//   submitBtn: {
+//     backgroundColor: "#000",
+//     height: 55,
+//     borderRadius: 14,
+//     justifyContent: "center",
+//     alignItems: "center",
+//     marginTop: 10,
+//   },
+//   submitBtnText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
+// });

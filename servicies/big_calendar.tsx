@@ -1,6 +1,8 @@
+import { styles } from "@/style/style";
+import base from "@/style/theme.json";
 import { useFocusEffect } from "@react-navigation/native";
-import { useCallback, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { useCallback, useRef, useState } from "react";
+import { View } from "react-native";
 import { Calendar } from "react-native-big-calendar";
 
 export let event = [
@@ -20,26 +22,33 @@ export function ShowCalendar() {
     }, []),
   );
   return (
-    <View style={styles.container}>
+    <View style={styles.calendar}>
       <Calendar
         events={calendarEvent}
         height={600}
         mode="3days"
         swipeEnabled={true}
         onPressEvent={(e) => console.log(e)}
+        theme={{
+          palette: {
+            primary: {
+              main: base.colors.border,
+              contrastText: base.colors.shadow,
+            },
+            gray: {
+              "200": base.colors.border,
+              "500": base.colors.secondary,
+              "800": base.colors.secondary,
+            },
+          },
+        }}
+        hourStyle={{
+          color: base.colors.secondary,
+        }}
       />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    display: "flex",
-    flex: 1,
-    width: "100%",
-    paddingTop: 50,
-  },
-});
 
 export default function SwipeCard() {
   const position = useRef(new Animated.ValueXY()).current;
@@ -78,11 +87,11 @@ export default function SwipeCard() {
           }).start();
         }
       },
-    })
+    }),
   ).current;
 
   return (
-    <View style={styles.container}>
+    <View style={styles.calendar}>
       <Animated.View
         {...panResponder.panHandlers}
         style={[
@@ -95,17 +104,3 @@ export default function SwipeCard() {
     </View>
   );
 }
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     alignItems: "center",
-//     justifyContent: "center",
-//   },
-//   card: {
-//     width: 250,
-//     height: 150,
-//     backgroundColor: "#4a90e2",
-//     borderRadius: 15,
-//   },
-// });
