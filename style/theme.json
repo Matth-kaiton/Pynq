@@ -1,18 +1,17 @@
 {
   "colors": {
-    "primary": "#F2A900",
-    "primaryContainer": "#FFDDA6",
-
-    "background": "#ffccff",
-    "backgroundLight": "#EEDCFA",
-    "backgroundDark": "#ff99ff",
-
-    "secondary": "#ff4433",
-    "secondaryContainer": "#FF6F61",
-
-    "error": "#FF6B6B",
-
-    "shadow": "#000000"
+    "primary": "#7A4DFF", // Violet électrique (Boutons)
+    "primaryContainer": "#FF922B", // Orange vif (Accent calendrier)
+    "secondary": "#F08C00", // Jaune-Orange (Boutons secondaires)
+    "background": "#F8F0FC", // Lavande ultra pâle (Fond)
+    "surface": "#FFFFFF",
+    "inputBackground": "#FFFFFF",
+    "text": "#E991FF",
+    "textSecondary": "#AE3EC9",
+    "border": "#E599F7", // Violet clair (Grille)
+    "calendarHeader": "#7048E8",
+    "calendarDay": "#2F1138",
+    "shadow": "#000"
   },
 
   "typography": {

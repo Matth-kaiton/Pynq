@@ -2,11 +2,11 @@ import "react-native-reanimated";
 
 import { useAuth } from "@/components/AuthContext";
 import { ShowCalendar } from "@/servicies/big_calendar";
-import { getEvent } from "@/servicies/GetCalandar";
 import * as Calendar from "expo-calendar";
 import { router } from "expo-router";
 import { useEffect } from "react";
-import { Button, Platform, StyleSheet, Text, View } from "react-native";
+import { Platform, Text, View, Pressable } from "react-native";
+import { styles } from "@/style/style";
 
 async function getDefaultCalendarSource() {
   const defaultCalendar = await Calendar.getDefaultCalendarAsync();
@@ -96,21 +96,21 @@ export default function CalendarScreen() {
 
   return (
     <View style={styles.container}>
-      <ShowCalendar />
-      <Text>User: {user ? user.email : "No user signed in"}</Text>
-      <Button title="Sign out" onPress={handleSignOut} />
-      <Button title="Get Event" onPress={getEvent} />
-      <Button title="Create a new calendar" onPress={createCalendar} />
-      <Button title="Delete Expo Calendars" onPress={deleteExpoCalendars} />
+      <View style={[styles.calendar, { flex: 1 }]}>
+        <ShowCalendar />
+      </View>
+      <Text style={styles.label}>
+        User: {user ? user.email : "No user signed in"}
+      </Text>
+      <Pressable style={styles.button} onPress={() => handleSignOut()}>
+        <Text style={styles.title}>Sign out</Text>
+      </Pressable>
+      <Pressable style={styles.button} onPress={() => createCalendar()}>
+        <Text style={styles.title}>Create a new calendar</Text>
+      </Pressable>
+      <Pressable style={styles.button} onPress={() => deleteExpoCalendars()}>
+        <Text style={styles.title}>Delete Expo Calendars</Text>
+      </Pressable>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "space-around",
-  },
-});

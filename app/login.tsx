@@ -1,11 +1,12 @@
 import { useAuth } from "@/components/AuthContext";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
+import { styles } from "@/style/style";
 import { router } from "expo-router";
 import { useState } from "react";
-import { Alert, Button, StyleSheet, TextInput } from "react-native";
+import { Alert, Pressable, Text, TextInput, View } from "react-native";
 
-export default function LoginScreen() {
+export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
@@ -48,63 +49,46 @@ export default function LoginScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      <ThemedText type="title" style={styles.title}>
+      <ThemedText type="title" style={[styles.title, { fontSize: 30 }]}>
         {isSignUp ? "Sign Up" : "Sign In"}
       </ThemedText>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        autoCapitalize="none"
-        keyboardType="email-address"
-      />
+      <View style={[styles.card, { width: "100%", height: "25%" }]}>
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          value={email}
+          onChangeText={setEmail}
+          autoCapitalize="none"
+          keyboardType="email-address"
+        />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
+        <TextInput
+          style={styles.input}
+          placeholder="Password"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+        />
+      </View>
 
-      <Button
-        title={loading ? "Loading..." : isSignUp ? "Sign Up" : "Sign In"}
-        onPress={handleAuth}
-        disabled={loading}
-      />
+      <Pressable style={styles.button} onPress={handleAuth} disabled={loading}>
+        <Text style={styles.title}>
+          {loading ? "Loading..." : isSignUp ? "Sign Up" : "Sign In"}
+        </Text>
+      </Pressable>
 
-      <Button
-        title={
-          isSignUp
+      <Pressable style={styles.button} onPress={() => setIsSignUp(!isSignUp)}>
+        <Text style={styles.title}>
+          {isSignUp
             ? "Already have an account? Sign In"
-            : "Don't have an account? Sign Up"
-        }
-        onPress={() => setIsSignUp(!isSignUp)}
-      />
+            : "Don't have an account? Sign Up"}
+        </Text>
+      </Pressable>
 
-      <Button title="Continue as Guest" onPress={handleGuest} />
+      <Pressable style={styles.button} onPress={handleGuest}>
+        <Text style={styles.title}>Continue as Guest</Text>
+      </Pressable>
     </ThemedView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    justifyContent: "center",
-  },
-  title: {
-    marginBottom: 30,
-    textAlign: "center",
-  },
-  input: {
-    backgroundColor: "#fff",
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 15,
-    borderWidth: 1,
-    borderColor: "#ddd",
-  },
-});
