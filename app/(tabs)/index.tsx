@@ -2,11 +2,11 @@ import "react-native-reanimated";
 
 import { useAuth } from "@/components/AuthContext";
 import { ShowCalendar } from "@/servicies/big_calendar";
+import { styles } from "@/style/style";
 import * as Calendar from "expo-calendar";
 import { router } from "expo-router";
 import { useEffect } from "react";
-import { Platform, Text, View, Pressable } from "react-native";
-import { styles } from "@/style/style";
+import { Platform, Text, View } from "react-native";
 
 async function getDefaultCalendarSource() {
   const defaultCalendar = await Calendar.getDefaultCalendarAsync();
@@ -102,7 +102,7 @@ export default function CalendarScreen() {
       <Text style={styles.label}>
         User: {user ? user.email : "No user signed in"}
       </Text>
-      <Pressable style={styles.button} onPress={() => handleSignOut()}>
+      {/* <Pressable style={styles.button} onPress={() => handleSignOut()}>
         <Text style={styles.title}>Sign out</Text>
       </Pressable>
       <Pressable style={styles.button} onPress={() => createCalendar()}>
@@ -110,7 +110,7 @@ export default function CalendarScreen() {
       </Pressable>
       <Pressable style={styles.button} onPress={() => deleteExpoCalendars()}>
         <Text style={styles.title}>Delete Expo Calendars</Text>
-      </Pressable>
+      </Pressable> */}
     </View>
   );
 }
