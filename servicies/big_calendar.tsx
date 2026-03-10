@@ -1,29 +1,33 @@
+import { useFocusEffect } from "@react-navigation/native";
+import { useCallback, useState } from "react";
+import { StyleSheet, View } from "react-native";
 import { Calendar } from "react-native-big-calendar";
-import { StyleSheet, View, Animated, PanResponder } from "react-native";
-import { use, useEffect, useRef } from "react";
 
-const events = [
+export let event = [
   {
-    title: "Meeting",
-    start: new Date(2025, 11, 2, 10, 0),
-    end: new Date(2025, 11, 2, 10, 30),
+    title: "",
+    start: new Date(),
+    end: new Date(),
   },
-  {
-    title: "Coffee break",
-    start: new Date(2025, 11, 3, 0, 0),
-    end: new Date(2026, 11, 12, 0, 0),
-  },
-  {
-    title: "Lunch",
-    start: new Date(2025, 11, 5, 0, 0),
-    end: new Date(2025, 11, 5, 0, 0),
-  }
 ];
 
 export function ShowCalendar() {
+  const [calendarEvent, setCalendarData] = useState(event);
+
+  useFocusEffect(
+    useCallback(() => {
+      setCalendarData([...event]);
+    }, []),
+  );
   return (
     <View style={styles.container}>
-      <Calendar events={events} height={600} mode="month" swipeEnabled={true} onPressEvent={(e) => console.log(e)} />
+      <Calendar
+        events={calendarEvent}
+        height={600}
+        mode="3days"
+        swipeEnabled={true}
+        onPressEvent={(e) => console.log(e)}
+      />
     </View>
   );
 }
