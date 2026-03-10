@@ -1,11 +1,17 @@
 import { supabase } from "@/lib/supabase";
 
-export async function getUserGroups() {
-  try {
+async function getUser() {
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    if (!user) return [];
+    if (!user) throw new Error("Utilisateur non authentifié");
+    return user;
+  }
+
+
+export async function getUserGroups() {
+  try {
+    const user = await getUser();
 
     const { data: groups, error } = await supabase
       .from("groups")
@@ -17,6 +23,48 @@ export async function getUserGroups() {
   } catch (error) {
     console.error("Erreur getUserGroups:", error);
     return [];
+  }
+}
+
+export async function createGroup(name: string, description: string) {
+  try {
+    const user = await getUser();
+
+    const { data, error } = await supabase.from("groups").insert([
+      {
+        name,
+        description,
+        members: [user.id],
+        owner_id: user.id,
+        admins: [user.id]
+      },
+    ]).select("id");
+
+    const inviteId = name + data?.[0]?.id;
+    const { error } = await supabase.from("groups").update({
+      invite_id: inviteId,
+    }).eq("id", data?.[0]?.id);
+
+    if (error) throw error;
+    return { success: true };
+  } catch (error) {
+    console.error("Erreur createGroup:", error);
+    return { success: false, error };
+  }
+}
+
+export async function joinGroup(groupId: number) {
+  try {
+    const user = await getUser();
+
+    const { error: insertError } = await supabase.from("groups").update({
+      members: supabase.rpc('array_append', {arr: "members", value: user.id}),
+    }).eq("id", groupId);
+    if (insertError) throw insertError;
+    return { success: true };
+  } catch (error) {
+    console.error("Erreur joinGroup:", error);
+    return { success: false, error };
   }
 }
 
