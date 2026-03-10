@@ -49,7 +49,7 @@ export default function Login() {
 
   return (
     <ThemedView style={styles.container}>
-      <ThemedText type="title" style={[styles.title, { fontSize: 30 }]}>
+      <ThemedText type="title" style={[styles.label, { fontSize: 30 }]}>
         {isSignUp ? "Sign Up" : "Sign In"}
       </ThemedText>
 

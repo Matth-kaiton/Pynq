@@ -6,7 +6,7 @@
     "background": "#F8F0FC", // Lavande ultra pâle (Fond)
     "surface": "#FFFFFF",
     "inputBackground": "#FFFFFF",
-    "text": "#E991FF",
+    "text": "#F9EBFA",
     "textSecondary": "#AE3EC9",
     "border": "#E599F7", // Violet clair (Grille)
     "calendarHeader": "#7048E8",

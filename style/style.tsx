@@ -12,6 +12,7 @@ export const styles = StyleSheet.create({
   },
   calendar: {
     flex: 1,
+    overflow: "hidden",
     justifyContent: "center",
     backgroundColor: base.colors.background,
     borderRadius: 20,
