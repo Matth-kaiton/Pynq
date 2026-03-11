@@ -4,28 +4,31 @@ import base from "./theme.json";
 const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 export const modal = StyleSheet.create({
+  // Le fond noir transparent qui couvre tout l'écran
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.6)",
-    justifyContent: "flex-end",
+    backgroundColor: "rgba(0, 0, 0, 0.6)", // Noir à 60% d'opacité
+    justifyContent: "flex-end", // Aligne la modal en bas
   },
 
+  // Le contenu blanc de la modal
   modalContent: {
     backgroundColor: base.colors.surface,
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
     padding: 20,
     paddingBottom: 40,
-    minHeight: SCREEN_HEIGHT * 0.4,
-
+    minHeight: SCREEN_HEIGHT * 0.4, // Prend au moins 40% de l'écran
+    // Ombre pour iOS
     shadowColor: base.colors.shadow,
     shadowOffset: { width: 0, height: -3 },
     shadowOpacity: 0.2,
     shadowRadius: 5,
-
+    // Ombre pour Android
     elevation: 20,
   },
 
+  // La petite barre grise tout en haut pour faire style "poignée"
   modalHandle: {
     width: 40,
     height: 5,
@@ -60,7 +63,6 @@ export const modal = StyleSheet.create({
   closeButton: {
     backgroundColor: base.colors.background,
     borderRadius: 10,
-    padding: 10,
     position: "absolute",
     top: 20,
     right: 20,
