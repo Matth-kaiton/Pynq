@@ -1,17 +1,20 @@
 import "react-native-reanimated";
 
 import { useAuth } from "@/components/AuthContext";
+import GroupModal from "@/components/GroupModal";
 import { ThemedText } from "@/components/themed-text";
 import { ShowCalendar } from "@/servicies/big_calendar";
-import { getUserGroups } from "@/servicies/db_queries";
+import { getGroupInviteId, getUserGroups } from "@/servicies/db_queries";
 import { styles } from "@/style/style";
 import * as Calendar from "expo-calendar";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
+  Alert,
   FlatList,
   Modal,
   Platform,
+  Share,
   Text,
   TouchableOpacity,
   View,
@@ -99,6 +102,28 @@ export default function CalendarScreen() {
     }
   };
 
+  const handleShareGroup = async () => {
+    if (!selectedGroupCalendar) {
+      Alert.alert("Erreur", "Aucun groupe sélectionné");
+      return;
+    }
+
+    try {
+      const inviteId = await getGroupInviteId(selectedGroupCalendar.id);
+      if (!inviteId) {
+        Alert.alert("Erreur", "Impossible de récupérer le code d'invitation");
+        return;
+      }
+
+      await Share.share({
+        message: `Rejoins mon groupe "${selectedGroupCalendar.name}" sur Pynq avec le code: ${inviteId}`,
+        title: `Invitation - ${selectedGroupCalendar.name}`,
+      });
+    } catch (error) {
+      console.error("Erreur lors du partage:", error);
+    }
+  };
+
   useEffect(() => {
     async function fetchGroups() {
       const userGroups = await getUserGroups();
@@ -121,21 +146,34 @@ export default function CalendarScreen() {
       </Text>
       <View style={styles.inputGroup}>
         <ThemedText style={styles.label}>Groupe de destination</ThemedText>
-        <TouchableOpacity
-          style={[
-            styles.card,
-            { justifyContent: "center", paddingHorizontal: 15 },
-          ]}
-          onPress={() => setIsModalVisibleCalendar(true)}
-        >
-          <ThemedText
-            style={{ color: selectedGroupCalendar ? "#000" : "#ffffff" }}
+        <View style={{ flexDirection: "row", gap: 10 }}>
+          <TouchableOpacity
+            style={[
+              styles.card,
+              { flex: 1, justifyContent: "center", paddingHorizontal: 15 },
+            ]}
+            onPress={() => setIsModalVisibleCalendar(true)}
           >
-            {selectedGroupCalendar
-              ? `📍 ${selectedGroupCalendar.name}`
-              : "Choisir un groupe"}
-          </ThemedText>
-        </TouchableOpacity>
+            <ThemedText
+              style={{ color: selectedGroupCalendar ? "#000" : "#ffffff" }}
+            >
+              {selectedGroupCalendar
+                ? `📍 ${selectedGroupCalendar.name}`
+                : "Choisir un groupe"}
+            </ThemedText>
+          </TouchableOpacity>
+          {selectedGroupCalendar && (
+            <TouchableOpacity
+              style={[
+                styles.card,
+                { justifyContent: "center", paddingHorizontal: 15 },
+              ]}
+              onPress={handleShareGroup}
+            >
+              <ThemedText style={{ fontSize: 20 }}>🔗</ThemedText>
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
 
       {/* SIMPLE MODAL FOR GROUP SELECTION */}
@@ -193,6 +231,7 @@ export default function CalendarScreen() {
           </View>
         </View>
       </Modal>
+      <GroupModal />
       {/*
       <Pressable style={styles.button} onPress={() => createCalendar()}>
         <Text style={styles.title}>Create a new calendar</Text>

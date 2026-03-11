@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase";
+import { Alert } from "react-native";
 
 async function getUser() {
   const {
@@ -25,7 +26,32 @@ export async function getUserGroups() {
   }
 }
 
+export async function getGroupInviteId(groupId: string) {
+  try {
+    const { data, error } = await supabase
+      .from("groups")
+      .select("invite_id")
+      .eq("id", groupId)
+      .single();
+
+    if (error || !data) {
+      console.error("Erreur getGroupInviteId:", error);
+      return null;
+    }
+
+    return data.invite_id;
+  } catch (error) {
+    console.error("Erreur getGroupInviteId:", error);
+    return null;
+  }
+}
+
 export async function createGroup(name: string, description: string) {
+  if (!name.trim()) {
+    Alert.alert("Champ vide", "Le nom du groupe est requis");
+    return { success: false, error: new Error("Le nom du groupe est requis") };
+  }
+
   try {
     const user = await getUser();
 
@@ -55,28 +81,45 @@ export async function createGroup(name: string, description: string) {
     if (updateError) throw updateError;
     return { success: true };
   } catch (error) {
-    console.error("Erreur createGroup:", error);
+    Alert.alert("Erreur", "Impossible de créer le groupe.");
     return { success: false, error };
   }
 }
 
-export async function joinGroup(groupId: number) {
-  try {
-    const user = await getUser();
+export async function joinGroup(inviteId: string) {
+  if (!inviteId.trim()) {
+    Alert.alert("Champ vide", "Le code d'invitation est requis");
+    return { success: false, error: new Error("Invite ID est requis") };
+  }
+  console.log("joinGroup called with inviteId:", inviteId);
 
-    const { error: insertError } = await supabase
-      .from("groups")
-      .update({
-        members: supabase.rpc("array_append", {
-          arr: "members",
-          value: user.id,
-        }),
-      })
-      .eq("id", groupId);
-    if (insertError) throw insertError;
+  const user = await getUser();
+
+  const groupId = await supabase
+    .from("groups")
+    .select("id")
+    .eq("invite_id", inviteId)
+    .single();
+
+  (await getUserGroups()).forEach((g) => {
+    if (g.id === groupId.data?.id) {
+      Alert.alert("Déjà membre", "Vous êtes déjà membre de ce groupe");
+      return { success: false, error: new Error("Déjà membre") };
+    }
+  });
+
+  try {
+    const { error } = await supabase.rpc("add_member_to_group", {
+      inviteid: inviteId,
+      userid: user.id,
+    });
+    if (error) {
+      Alert.alert("Erreur", "Impossible de rejoindre le groupe.");
+      throw error;
+    }
     return { success: true };
   } catch (error) {
-    console.error("Erreur joinGroup:", error);
+    Alert.alert("Erreur", "Impossible de rejoindre le groupe.");
     return { success: false, error };
   }
 }
@@ -92,7 +135,11 @@ export async function registerEvent(
     const groups = await getUserGroups();
 
     if (!groups || groups.length === 0) {
-      throw new Error("Aucun groupe trouvé");
+      Alert.alert(
+        "Aucun groupe",
+        "Vous devez être membre d'un groupe pour créer un événement.",
+      );
+      return { success: false, error: new Error("Aucun groupe trouvé") };
     }
 
     // 2. Insertion
@@ -108,7 +155,7 @@ export async function registerEvent(
     if (insertError) throw insertError;
     return { success: true };
   } catch (error) {
-    console.error("Erreur registerEvent:", error);
+    Alert.alert("Erreur", "Impossible de sauvegarder l'événement.");
     return { success: false, error };
   }
 }
@@ -141,7 +188,7 @@ export async function getRemoteEvents(groupId?: string) {
       end: new Date(e.end_date),
     }));
   } catch (error) {
-    console.error("Erreur getRemoteEvents:", error);
+    Alert.alert("Erreur", "Impossible de récupérer les événements.");
     return [];
   }
 }
