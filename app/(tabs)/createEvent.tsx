@@ -242,7 +242,9 @@ export default function CreateEvent() {
                       setIsModalVisible(false);
                     }}
                   >
-                    <ThemedText>{item.name}</ThemedText>
+                    <ThemedText style={{ color: "#000" }}>
+                      {item.name}
+                    </ThemedText>
                   </TouchableOpacity>
                 )}
               />
