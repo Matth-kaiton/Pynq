@@ -26,6 +26,26 @@ export async function getUserGroups() {
   }
 }
 
+export async function getGroupInviteId(groupId: string) {
+  try {
+    const { data, error } = await supabase
+      .from("groups")
+      .select("invite_id")
+      .eq("id", groupId)
+      .single();
+
+    if (error || !data) {
+      console.error("Erreur getGroupInviteId:", error);
+      return null;
+    }
+
+    return data.invite_id;
+  } catch (error) {
+    console.error("Erreur getGroupInviteId:", error);
+    return null;
+  }
+}
+
 export async function createGroup(name: string, description: string) {
   if (!name.trim()) {
     Alert.alert("Champ vide", "Le nom du groupe est requis");
@@ -74,20 +94,20 @@ export async function joinGroup(inviteId: string) {
   console.log("joinGroup called with inviteId:", inviteId);
 
   const user = await getUser();
-  
+
   const groupId = await supabase
-  .from("groups")
-  .select("id")
-  .eq("invite_id", inviteId)
-  .single();
-  
+    .from("groups")
+    .select("id")
+    .eq("invite_id", inviteId)
+    .single();
+
   (await getUserGroups()).forEach((g) => {
     if (g.id === groupId.data?.id) {
       Alert.alert("Déjà membre", "Vous êtes déjà membre de ce groupe");
       return { success: false, error: new Error("Déjà membre") };
     }
   });
-  
+
   try {
     const { error } = await supabase.rpc("add_member_to_group", {
       inviteid: inviteId,
@@ -115,7 +135,10 @@ export async function registerEvent(
     const groups = await getUserGroups();
 
     if (!groups || groups.length === 0) {
-      Alert.alert("Aucun groupe", "Vous devez être membre d'un groupe pour créer un événement.");
+      Alert.alert(
+        "Aucun groupe",
+        "Vous devez être membre d'un groupe pour créer un événement.",
+      );
       return { success: false, error: new Error("Aucun groupe trouvé") };
     }
 
