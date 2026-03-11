@@ -16,6 +16,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import GroupModal from "@/components/GroupModal"
 
 async function getDefaultCalendarSource() {
   const defaultCalendar = await Calendar.getDefaultCalendarAsync();
@@ -193,6 +194,7 @@ export default function CalendarScreen() {
           </View>
         </View>
       </Modal>
+      <GroupModal />
       {/*
       <Pressable style={styles.button} onPress={() => createCalendar()}>
         <Text style={styles.title}>Create a new calendar</Text>
