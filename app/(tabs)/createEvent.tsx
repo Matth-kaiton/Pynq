@@ -1,13 +1,15 @@
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import { registerEvent } from "@/servicies/GetCalandar"; // Import de la fonction Supabase
+import { getUserGroups, registerEvent } from "@/servicies/db_queries"; // Import de la fonction Supabase
 import { styles } from "@/style/style";
 import base from "@/style/theme.json";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { CalendarClock } from "lucide-react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Alert,
+  FlatList,
+  Modal,
   Pressable,
   ScrollView,
   Switch,
@@ -25,6 +27,12 @@ export function CreateEvent({
   onSuccess,
 }: CreateEventProps & { onSuccess: () => void }) {
   const [text, setText] = useState("");
+  const [groups, setGroups] = useState<{ id: string; name: string }[]>([]);
+  const [selectedGroup, setSelectedGroup] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   // States pour les dates (initialisés vides)
   // const [startYear, setStartYear] = useState("");
@@ -45,32 +53,22 @@ export function CreateEvent({
   const [show, setShow] = useState(false);
   const [mode, setMode] = useState<"date" | "time">("date");
 
+  useEffect(() => {
+    async function fetchGroups() {
+      const userGroups = await getUserGroups();
+      setGroups(userGroups);
+      if (userGroups.length > 0) {
+        setSelectedGroup(userGroups[0]); // Default to first group
+      }
+    }
+    fetchGroups();
+  }, []);
+
   const handleSubmit = async () => {
-    //old
-    // Vérification basique
-    // if (!text || !startYear || !startDay || !startMonth) {
-    //   Alert.alert("Erreur", "Veuillez remplir les informations de début.");
-    //   return;
-    // }
-
-    // // 1. Création des objets Date (Attention : mois - 1 en JS)
-    // const startDate = new Date(
-    //   parseInt(startYear),
-    //   parseInt(startMonth) - 1,
-    //   parseInt(startDay),
-    //   parseInt(startT) || 0,
-    //   parseInt(startTM) || 0,
-    // );
-
-    // const endDate = new Date(
-    //   parseInt(endYear) || parseInt(startYear),
-    //   parseInt(endMonth) - 1 || parseInt(startMonth) - 1,
-    //   parseInt(endDay) || parseInt(startDay),
-    //   parseInt(endT) || 0,
-    //   parseInt(endTM) || 0,
-    // );
-
-    // 2. Envoi vers Supabase
+    if (!selectedGroup) {
+      Alert.alert("Erreur", "Veuillez sélectionner un groupe");
+      return;
+    }
 
     let finalStart = new Date(selectedDate);
     let finalEnd = new Date(endDate);
@@ -80,7 +78,12 @@ export function CreateEvent({
       finalEnd.setHours(23, 59, 59, 999);
     }
 
-    const result = await registerEvent(text, finalStart, finalEnd);
+    const result = await registerEvent(
+      text,
+      finalStart,
+      finalEnd,
+      selectedGroup.id,
+    );
 
     if (result?.success) {
       Alert.alert("Succès", "Événement enregistré dans le cloud !");
@@ -186,24 +189,6 @@ export function CreateEvent({
             <Pressable style={styles.button} onPress={() => setShow(true)}>
               <CalendarClock color={base.colors.text} />
             </Pressable>
-            {/* <TextInput
-              style={[styles.input, { flex: 1.5 }]}
-              placeholder="JJ"
-              keyboardType="numeric"
-              onChangeText={setStartDay}
-            />
-            <TextInput
-              style={[styles.input, { flex: 1.5 }]}
-              placeholder="MM"
-              keyboardType="numeric"
-              onChangeText={setStartMonth}
-            />
-            <TextInput
-              style={[styles.input, { flex: 2 }]}
-              placeholder="AAAA"
-              keyboardType="numeric"
-              onChangeText={setStartYear}
-            /> */}
           </View>
           <View style={styles.row}>
             <ThemedText style={styles.label}>Toute la journée</ThemedText>
@@ -239,60 +224,79 @@ export function CreateEvent({
                 </Pressable>
               </View>
             )}
-            {/* <TextInput
-              style={styles.input}
-              placeholder="HH"
-              keyboardType="numeric"
-              onChangeText={setStartT}
-            />
-            <ThemedText style={styles.separator}>:</ThemedText>
-            <TextInput
-              style={styles.input}
-              placeholder="mm"
-              keyboardType="numeric"
-              onChangeText={setStartTM}
-            /> */}
           </View>
         </View>
 
-        {/* <View style={styles.card}>
-          <ThemedText style={styles.label}>FIN</ThemedText>
-          <View style={styles.row}>
-            <TextInput
-              style={[styles.input, { flex: 1.5 }]}
-              placeholder="JJ"
-              keyboardType="numeric"
-              onChangeText={setEndDay}
-            />
-            <TextInput
-              style={[styles.input, { flex: 1.5 }]}
-              placeholder="MM"
-              keyboardType="numeric"
-              onChangeText={setEndMonth}
-            />
-            <TextInput
-              style={[styles.input, { flex: 2 }]}
-              placeholder="AAAA"
-              keyboardType="numeric"
-              onChangeText={setEndYear}
-            />
+        <View style={styles.inputGroup}>
+          <ThemedText style={styles.label}>Groupe de destination</ThemedText>
+          <TouchableOpacity
+            style={[
+              styles.input,
+              { justifyContent: "center", paddingHorizontal: 15 },
+            ]}
+            onPress={() => setIsModalVisible(true)}
+          >
+            <ThemedText style={{ color: selectedGroup ? "#000" : "#ffffff" }}>
+              {selectedGroup ? `📍 ${selectedGroup.name}` : "Choisir un groupe"}
+            </ThemedText>
+          </TouchableOpacity>
+        </View>
+
+        {/* SIMPLE MODAL FOR GROUP SELECTION */}
+        <Modal
+          visible={isModalVisible}
+          animationType="slide"
+          transparent={true}
+        >
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "flex-end",
+              backgroundColor: "rgba(0,0,0,0.5)",
+            }}
+          >
+            <View
+              style={{
+                backgroundColor: "white",
+                borderTopLeftRadius: 20,
+                borderTopRightRadius: 20,
+                padding: 20,
+                maxHeight: "50%",
+              }}
+            >
+              <ThemedText
+                style={[styles.label, { fontSize: 18, marginBottom: 15 }]}
+              >
+                Sélectionner un groupe
+              </ThemedText>
+              <FlatList
+                data={groups}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    style={{
+                      paddingVertical: 15,
+                      borderBottomWidth: 1,
+                      borderBottomColor: "#ffffff",
+                    }}
+                    onPress={() => {
+                      setSelectedGroup(item);
+                      setIsModalVisible(false);
+                    }}
+                  >
+                    <ThemedText>{item.name}</ThemedText>
+                  </TouchableOpacity>
+                )}
+              />
+              <TouchableOpacity
+                onPress={() => setIsModalVisible(false)}
+                style={{ marginTop: 15, alignItems: "center" }}
+              >
+                <ThemedText style={{ color: "red" }}>Annuler</ThemedText>
+              </TouchableOpacity>
+            </View>
           </View>
-          <View style={styles.row}>
-            <TextInput
-              style={styles.input}
-              placeholder="HH"
-              keyboardType="numeric"
-              onChangeText={setEndT}
-            />
-            <ThemedText style={styles.separator}>:</ThemedText>
-            <TextInput
-              style={styles.input}
-              placeholder="mm"
-              keyboardType="numeric"
-              onChangeText={setEndTM}
-            />
-          </View>
-        </View> */}
+        </Modal>
 
         <TouchableOpacity style={styles.button} onPress={handleSubmit}>
           <ThemedText style={styles.title}>Enregistrer l'événement</ThemedText>
