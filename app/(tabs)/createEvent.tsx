@@ -1,16 +1,15 @@
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import { registerEvent } from "@/servicies/GetCalandar"; // Import de la fonction Supabase
+import { registerEvent } from "@/servicies/db_queries"; // Import de la fonction Supabase
 import { styles } from "@/style/style";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
   Alert,
   ScrollView,
-  StyleSheet,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 
 export default function CreateEvent() {

@@ -4,7 +4,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useCallback, useRef, useState } from "react";
 import { ActivityIndicator, Animated, PanResponder, View } from "react-native";
 import { Calendar } from "react-native-big-calendar";
-import { getRemoteEvents } from "./GetCalandar";
+import { getRemoteEvents } from "./db_queries";
 
 export function ShowCalendar() {
   const [calendarEvents, setCalendarEvents] = useState<any[]>([]);
