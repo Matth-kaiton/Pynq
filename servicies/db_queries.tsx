@@ -113,7 +113,7 @@ export async function registerEvent(
   }
 }
 
-export async function getRemoteEvents() {
+export async function getRemoteEvents(groupId?: string) {
   try {
     const groups = await getUserGroups();
     let eventsGrp: any[] = [];
@@ -121,7 +121,7 @@ export async function getRemoteEvents() {
     if (!groups) return [];
 
     for (let index = 0; index < groups.length; index++) {
-      if (!groups[index]) return [];
+      if (!groups[index] || groups[index].id !== groupId) continue;
       const element = groups[index];
       const { data: events, error } = await supabase
         .from("events")

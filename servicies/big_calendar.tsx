@@ -6,7 +6,11 @@ import { ActivityIndicator, Animated, PanResponder, View } from "react-native";
 import { Calendar } from "react-native-big-calendar";
 import { getRemoteEvents } from "./db_queries";
 
-export function ShowCalendar() {
+interface ShowCalendarProps {
+  selectedGroupId?: string;
+}
+
+export function ShowCalendar({ selectedGroupId }: ShowCalendarProps) {
   const [calendarEvents, setCalendarEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(false); // Mis à false pour l'exemple
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -84,7 +88,7 @@ export function ShowCalendar() {
       let isActive = true;
       const loadData = async () => {
         setLoading(true);
-        const data = await getRemoteEvents();
+        const data = await getRemoteEvents(selectedGroupId);
         if (isActive) {
           setCalendarEvents(data);
           setLoading(false);
@@ -94,7 +98,7 @@ export function ShowCalendar() {
       return () => {
         isActive = false;
       };
-    }, []),
+    }, [selectedGroupId]),
   );
 
   if (loading) {

@@ -1,12 +1,21 @@
 import "react-native-reanimated";
 
 import { useAuth } from "@/components/AuthContext";
+import { ThemedText } from "@/components/themed-text";
 import { ShowCalendar } from "@/servicies/big_calendar";
+import { getUserGroups } from "@/servicies/db_queries";
 import { styles } from "@/style/style";
 import * as Calendar from "expo-calendar";
 import { router } from "expo-router";
-import { useEffect } from "react";
-import { Platform, Text, View } from "react-native";
+import { useEffect, useState } from "react";
+import {
+  FlatList,
+  Modal,
+  Platform,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 async function getDefaultCalendarSource() {
   const defaultCalendar = await Calendar.getDefaultCalendarAsync();
@@ -71,6 +80,14 @@ async function createCalendar() {
 
 export default function CalendarScreen() {
   const { signOut, user } = useAuth();
+  const [groupsCalendar, setGroupsCalendar] = useState<
+    { id: string; name: string }[]
+  >([]);
+  const [selectedGroupCalendar, setSelectedGroupCalendar] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
+  const [isModalVisibleCalendar, setIsModalVisibleCalendar] = useState(false);
 
   const handleSignOut = async () => {
     try {
@@ -83,28 +100,100 @@ export default function CalendarScreen() {
   };
 
   useEffect(() => {
-    (async () => {
-      const { status } = await Calendar.requestCalendarPermissionsAsync();
-      if (status === "granted") {
-        const calendars = await Calendar.getCalendarsAsync(
-          Calendar.EntityTypes.EVENT,
-        );
-        console.log("Here are all event:");
+    async function fetchGroups() {
+      const userGroups = await getUserGroups();
+      setGroupsCalendar(userGroups);
+      if (userGroups.length > 0) {
+        console.log(userGroups[0]);
+        setSelectedGroupCalendar(userGroups[0]); // Default to first group
       }
-    })();
+    }
+    fetchGroups();
   }, []);
 
   return (
     <View style={styles.container}>
       <View style={[styles.calendar, { flex: 1 }]}>
-        <ShowCalendar />
+        <ShowCalendar selectedGroupId={selectedGroupCalendar?.id} />
       </View>
       <Text style={styles.label}>
         User: {user ? user.email : "No user signed in"}
       </Text>
-      {/* <Pressable style={styles.button} onPress={() => handleSignOut()}>
-        <Text style={styles.title}>Sign out</Text>
-      </Pressable>
+      <View style={styles.inputGroup}>
+        <ThemedText style={styles.label}>Groupe de destination</ThemedText>
+        <TouchableOpacity
+          style={[
+            styles.card,
+            { justifyContent: "center", paddingHorizontal: 15 },
+          ]}
+          onPress={() => setIsModalVisibleCalendar(true)}
+        >
+          <ThemedText
+            style={{ color: selectedGroupCalendar ? "#000" : "#ffffff" }}
+          >
+            {selectedGroupCalendar
+              ? `📍 ${selectedGroupCalendar.name}`
+              : "Choisir un groupe"}
+          </ThemedText>
+        </TouchableOpacity>
+      </View>
+
+      {/* SIMPLE MODAL FOR GROUP SELECTION */}
+      <Modal
+        visible={isModalVisibleCalendar}
+        animationType="slide"
+        transparent={true}
+      >
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "flex-end",
+            backgroundColor: "rgba(0,0,0,0.5)",
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: "white",
+              borderTopLeftRadius: 20,
+              borderTopRightRadius: 20,
+              padding: 20,
+              maxHeight: "50%",
+            }}
+          >
+            <ThemedText
+              style={[styles.label, { fontSize: 18, marginBottom: 15 }]}
+            >
+              Sélectionner un groupe
+            </ThemedText>
+            <FlatList
+              data={groupsCalendar}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={{
+                    paddingVertical: 15,
+                    borderBottomWidth: 1,
+                    borderBottomColor: "#ffffff",
+                  }}
+                  onPress={() => {
+                    setSelectedGroupCalendar(item);
+                    setIsModalVisibleCalendar(false);
+                  }}
+                >
+                  <ThemedText style={{ color: "#000" }}>{item.name}</ThemedText>
+                </TouchableOpacity>
+              )}
+            />
+            <TouchableOpacity
+              onPress={() => setIsModalVisibleCalendar(false)}
+              style={{ marginTop: 15, alignItems: "center" }}
+            >
+              <ThemedText style={{ color: "red" }}>Annuler</ThemedText>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+      {/*
       <Pressable style={styles.button} onPress={() => createCalendar()}>
         <Text style={styles.title}>Create a new calendar</Text>
       </Pressable>
