@@ -26,10 +26,16 @@ export async function getUserGroups() {
 }
 
 export async function createGroup(name: string, description: string) {
+  if (!name.trim()) {
+    console.error("createGroup called without name");
+    return { success: false, error: new Error("Le nom du groupe est requis") };
+  }
+
   try {
     const user = await getUser();
+    const inviteId = name + "-" + Math.round(Math.random() * 1000);
 
-    const { data, error: insertError } = await supabase
+    const { error: insertError } = await supabase
       .from("groups")
       .insert([
         {
@@ -38,21 +44,12 @@ export async function createGroup(name: string, description: string) {
           members: [user.id],
           owner_id: user.id,
           admins: [user.id],
+          invite_id: inviteId,
         },
       ])
-      .select("id");
 
     if (insertError) throw insertError;
 
-    const inviteId = name + data?.[0]?.id;
-    const { error: updateError } = await supabase
-      .from("groups")
-      .update({
-        invite_id: inviteId,
-      })
-      .eq("id", data?.[0]?.id);
-
-    if (updateError) throw updateError;
     return { success: true };
   } catch (error) {
     console.error("Erreur createGroup:", error);
@@ -60,20 +57,33 @@ export async function createGroup(name: string, description: string) {
   }
 }
 
-export async function joinGroup(groupId: number) {
-  try {
-    const user = await getUser();
+export async function joinGroup(inviteId: string) {
+  if (!inviteId.trim()) {
+    console.error("joinGroup called without inviteId");
+    return { success: false, error: new Error("Invite ID est requis") };
+  }
+  console.log("joinGroup called with inviteId:", inviteId);
 
-    const { error: insertError } = await supabase
-      .from("groups")
-      .update({
-        members: supabase.rpc("array_append", {
-          arr: "members",
-          value: user.id,
-        }),
-      })
-      .eq("id", groupId);
-    if (insertError) throw insertError;
+  const user = await getUser();
+  
+  const groupId = await supabase
+  .from("groups")
+  .select("id")
+  .eq("invite_id", inviteId)
+  .single();
+  
+  (await getUserGroups()).forEach((g) => {
+    if (g.id === groupId.data?.id) {
+      throw new Error("Vous êtes déjà membre de ce groupe");
+    }
+  });
+  
+  try {
+    const { error } = await supabase.rpc("add_member_to_group", {
+      inviteid: inviteId,
+      userid: user.id,
+    });
+    if (error) throw error;
     return { success: true };
   } catch (error) {
     console.error("Erreur joinGroup:", error);
