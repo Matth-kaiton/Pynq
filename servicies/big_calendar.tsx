@@ -1,3 +1,4 @@
+import { CreateEvent } from "@/app/(tabs)/createEvent";
 import { modal } from "@/style/modal";
 import { styles } from "@/style/style";
 import base from "@/style/theme.json";
@@ -21,10 +22,21 @@ export function ShowCalendar() {
   const [loading, setLoading] = useState(false); // Mis à false pour l'exemple
   const [selectedDate, setSelectedDate] = useState(new Date());
 
+  const [createDate, setCreateDate] = useState(new Date());
+  const [isCreatModalVisible, setIsCreatModalVisible] = useState(false);
+
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   const translateX = useRef(new Animated.Value(0)).current;
+
+  const refreshData = async () => {
+    setLoading(true);
+    const data = await getRemoteEvents();
+    setCalendarEvents(data);
+    setIsCreatModalVisible(false); // Ferme la modal
+    setLoading(false);
+  };
 
   const panResponder = useRef(
     PanResponder.create({
@@ -131,6 +143,10 @@ export function ShowCalendar() {
           date={selectedDate}
           events={calendarEvents}
           height={600}
+          onPressCell={(event) => {
+            setCreateDate(event);
+            setIsCreatModalVisible(true);
+          }}
           mode="3days"
           swipeEnabled={false}
           onPressEvent={(event) => {
@@ -200,6 +216,22 @@ export function ShowCalendar() {
               </View>
             )}
           </View>
+        </View>
+      </Modal>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isCreatModalVisible}
+        onRequestClose={() => setIsCreatModalVisible(false)}
+      >
+        <View style={modal.modalOverlay}>
+          <Pressable
+            style={modal.closeButton}
+            onPress={() => setIsCreatModalVisible(false)}
+          >
+            <X color={base.colors.textSecondary} size={24} />
+          </Pressable>
+          <CreateEvent initialDate={createDate} onSuccess={refreshData} />
         </View>
       </Modal>
     </View>
