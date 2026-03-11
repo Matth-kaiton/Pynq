@@ -1,8 +1,14 @@
+import { ThemedText } from "@/components/themed-text";
 import { createGroup, joinGroup } from "@/servicies/db_queries";
 import { styles } from "@/style/style";
 import { JSX, useState } from "react";
-import { Modal, Pressable, TextInput, View } from "react-native";
-import { ThemedText } from "@/components/themed-text";
+import {
+  Modal,
+  Pressable,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 function formCreateGroup(
   groupName: string,
@@ -13,14 +19,22 @@ function formCreateGroup(
 ) {
   return (
     <View>
+      <ThemedText style={[styles.label, { fontSize: 18, marginBottom: 15 }]}>
+        Créer un groupe
+      </ThemedText>
+
       <TextInput
+        style={[styles.input, { color: "#000", flex: undefined }]}
         placeholder="Nom du groupe"
+        placeholderTextColor="#999"
         value={groupName}
         onChangeText={setGroupName}
       />
 
       <TextInput
+        style={[styles.input, { color: "#000", flex: undefined }]}
         placeholder="Description"
+        placeholderTextColor="#999"
         value={groupDescription}
         onChangeText={setGroupDescription}
       />
@@ -32,9 +46,14 @@ function formCreateGroup(
         <ThemedText>Créer</ThemedText>
       </Pressable>
 
-      <Pressable style={styles.button} onPress={() => setCreatingGroup(false)}>
-        <ThemedText>Rejoindre un groupe</ThemedText>
-      </Pressable>
+      <TouchableOpacity
+        onPress={() => setCreatingGroup(false)}
+        style={{ marginTop: 15, alignItems: "center" }}
+      >
+        <ThemedText style={{ color: "#007AFF" }}>
+          Rejoindre un groupe
+        </ThemedText>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -46,18 +65,28 @@ function formJoinGroup(
 ) {
   return (
     <View>
+      <ThemedText style={[styles.label, { fontSize: 18, marginBottom: 15 }]}>
+        Rejoindre un groupe
+      </ThemedText>
+
       <TextInput
+        style={[styles.input, { color: "#000", flex: undefined }]}
         placeholder="Invite ID"
+        placeholderTextColor="#999"
         value={inviteId}
         onChangeText={setInviteId}
       />
+
       <Pressable style={styles.button} onPress={() => joinGroup(inviteId)}>
         <ThemedText>Rejoindre</ThemedText>
       </Pressable>
 
-      <Pressable style={styles.button} onPress={() => setCreatingGroup(true)}>
-        <ThemedText>Créer un groupe</ThemedText>
-      </Pressable>
+      <TouchableOpacity
+        onPress={() => setCreatingGroup(true)}
+        style={{ marginTop: 15, alignItems: "center" }}
+      >
+        <ThemedText style={{ color: "#007AFF" }}>Créer un groupe</ThemedText>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -92,9 +121,35 @@ export default function GroupModal() {
       <Modal
         animationType="slide"
         visible={modalVisible}
+        transparent={true}
         onRequestClose={() => setModalVisible(false)}
       >
-        {form}
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "flex-end",
+            backgroundColor: "rgba(0,0,0,0.5)",
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: "white",
+              borderTopLeftRadius: 20,
+              borderTopRightRadius: 20,
+              padding: 20,
+              maxHeight: "70%",
+            }}
+          >
+            {form}
+
+            <TouchableOpacity
+              onPress={() => setModalVisible(false)}
+              style={{ marginTop: 15, alignItems: "center" }}
+            >
+              <ThemedText style={{ color: "red" }}>Annuler</ThemedText>
+            </TouchableOpacity>
+          </View>
+        </View>
       </Modal>
     </View>
   );
