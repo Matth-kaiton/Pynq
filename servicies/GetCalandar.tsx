@@ -1,13 +1,12 @@
 import { supabase } from "@/lib/supabase";
 
 async function getUser() {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) throw new Error("Utilisateur non authentifié");
-    return user;
-  }
-
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("Utilisateur non authentifié");
+  return user;
+}
 
 export async function getUserGroups() {
   try {
@@ -30,22 +29,30 @@ export async function createGroup(name: string, description: string) {
   try {
     const user = await getUser();
 
-    const { data, error } = await supabase.from("groups").insert([
-      {
-        name,
-        description,
-        members: [user.id],
-        owner_id: user.id,
-        admins: [user.id]
-      },
-    ]).select("id");
+    const { data, error: insertError } = await supabase
+      .from("groups")
+      .insert([
+        {
+          name,
+          description,
+          members: [user.id],
+          owner_id: user.id,
+          admins: [user.id],
+        },
+      ])
+      .select("id");
+
+    if (insertError) throw insertError;
 
     const inviteId = name + data?.[0]?.id;
-    const { error } = await supabase.from("groups").update({
-      invite_id: inviteId,
-    }).eq("id", data?.[0]?.id);
+    const { error: updateError } = await supabase
+      .from("groups")
+      .update({
+        invite_id: inviteId,
+      })
+      .eq("id", data?.[0]?.id);
 
-    if (error) throw error;
+    if (updateError) throw updateError;
     return { success: true };
   } catch (error) {
     console.error("Erreur createGroup:", error);
@@ -57,9 +64,15 @@ export async function joinGroup(groupId: number) {
   try {
     const user = await getUser();
 
-    const { error: insertError } = await supabase.from("groups").update({
-      members: supabase.rpc('array_append', {arr: "members", value: user.id}),
-    }).eq("id", groupId);
+    const { error: insertError } = await supabase
+      .from("groups")
+      .update({
+        members: supabase.rpc("array_append", {
+          arr: "members",
+          value: user.id,
+        }),
+      })
+      .eq("id", groupId);
     if (insertError) throw insertError;
     return { success: true };
   } catch (error) {
@@ -70,7 +83,6 @@ export async function joinGroup(groupId: number) {
 
 export async function registerEvent(title: string, start: Date, end: Date) {
   try {
-
     // 1. Récupérer les groupes
     const groups = await getUserGroups();
 
