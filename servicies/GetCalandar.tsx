@@ -86,7 +86,7 @@ export async function registerEvent(title: string, start: Date, end: Date) {
     // 1. Récupérer les groupes
     const groups = await getUserGroups();
 
-    if (/*groupError ||*/ !groups || groups.length === 0) {
+    if (!groups || groups.length === 0) {
       throw new Error("Aucun groupe trouvé");
     }
 
