@@ -36,7 +36,7 @@ export function ShowCalendar({ selectedGroupId }: ShowCalendarProps) {
 
   const refreshData = async () => {
     setLoading(true);
-    const data = await getRemoteEvents();
+    const data = await getRemoteEvents(selectedGroupId);
     setCalendarEvents(data);
     setIsCreatModalVisible(false); // Ferme la modal
     setLoading(false);
