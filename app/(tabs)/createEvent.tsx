@@ -1,19 +1,27 @@
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import { registerEvent } from "@/servicies/db_queries"; // Import de la fonction Supabase
+import { getUserGroups, registerEvent } from "@/servicies/db_queries"; // Import de la fonction Supabase
 import { styles } from "@/style/style";
 import { router } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Alert,
+  FlatList,
+  Modal,
   ScrollView,
   TextInput,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 
 export default function CreateEvent() {
   const [text, setText] = useState("");
+  const [groups, setGroups] = useState<{ id: string; name: string }[]>([]);
+  const [selectedGroup, setSelectedGroup] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   // States pour les dates (initialisés vides)
   const [startYear, setStartYear] = useState("");
@@ -26,6 +34,17 @@ export default function CreateEvent() {
   const [endT, setEndT] = useState("");
   const [startTM, setStartTM] = useState("");
   const [endTM, setEndTM] = useState("");
+
+  useEffect(() => {
+    async function fetchGroups() {
+      const userGroups = await getUserGroups();
+      setGroups(userGroups);
+      if (userGroups.length > 0) {
+        setSelectedGroup(userGroups[0]); // Default to first group
+      }
+    }
+    fetchGroups();
+  }, []);
 
   const handleSubmit = async () => {
     // Vérification basique
@@ -52,7 +71,12 @@ export default function CreateEvent() {
     );
 
     // 2. Envoi vers Supabase
-    const result = await registerEvent(text, startDate, endDate);
+    const result = await registerEvent(
+      text,
+      startDate,
+      endDate,
+      selectedGroup.id,
+    );
 
     if (result?.success) {
       Alert.alert("Succès", "Événement enregistré dans le cloud !");
@@ -160,6 +184,77 @@ export default function CreateEvent() {
             />
           </View>
         </View>
+
+        <View style={styles.inputGroup}>
+          <ThemedText style={styles.label}>Groupe de destination</ThemedText>
+          <TouchableOpacity
+            style={[
+              styles.input,
+              { justifyContent: "center", paddingHorizontal: 15 },
+            ]}
+            onPress={() => setIsModalVisible(true)}
+          >
+            <ThemedText style={{ color: selectedGroup ? "#000" : "#ffffff" }}>
+              {selectedGroup ? `📍 ${selectedGroup.name}` : "Choisir un groupe"}
+            </ThemedText>
+          </TouchableOpacity>
+        </View>
+
+        {/* SIMPLE MODAL FOR GROUP SELECTION */}
+        <Modal
+          visible={isModalVisible}
+          animationType="slide"
+          transparent={true}
+        >
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "flex-end",
+              backgroundColor: "rgba(0,0,0,0.5)",
+            }}
+          >
+            <View
+              style={{
+                backgroundColor: "white",
+                borderTopLeftRadius: 20,
+                borderTopRightRadius: 20,
+                padding: 20,
+                maxHeight: "50%",
+              }}
+            >
+              <ThemedText
+                style={[styles.label, { fontSize: 18, marginBottom: 15 }]}
+              >
+                Sélectionner un groupe
+              </ThemedText>
+              <FlatList
+                data={groups}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    style={{
+                      paddingVertical: 15,
+                      borderBottomWidth: 1,
+                      borderBottomColor: "#ffffff",
+                    }}
+                    onPress={() => {
+                      setSelectedGroup(item);
+                      setIsModalVisible(false);
+                    }}
+                  >
+                    <ThemedText>{item.name}</ThemedText>
+                  </TouchableOpacity>
+                )}
+              />
+              <TouchableOpacity
+                onPress={() => setIsModalVisible(false)}
+                style={{ marginTop: 15, alignItems: "center" }}
+              >
+                <ThemedText style={{ color: "red" }}>Annuler</ThemedText>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
 
         <TouchableOpacity style={styles.button} onPress={handleSubmit}>
           <ThemedText style={styles.title}>Enregistrer l'événement</ThemedText>
