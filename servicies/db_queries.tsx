@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase";
+import { Alert } from "react-native";
 
 async function getUser() {
   const {
@@ -27,7 +28,7 @@ export async function getUserGroups() {
 
 export async function createGroup(name: string, description: string) {
   if (!name.trim()) {
-    console.error("createGroup called without name");
+    Alert.alert("Champ vide", "Le nom du groupe est requis");
     return { success: false, error: new Error("Le nom du groupe est requis") };
   }
 
@@ -52,14 +53,14 @@ export async function createGroup(name: string, description: string) {
 
     return { success: true };
   } catch (error) {
-    console.error("Erreur createGroup:", error);
+    Alert.alert("Erreur", "Impossible de créer le groupe.");
     return { success: false, error };
   }
 }
 
 export async function joinGroup(inviteId: string) {
   if (!inviteId.trim()) {
-    console.error("joinGroup called without inviteId");
+    Alert.alert("Champ vide", "Le code d'invitation est requis");
     return { success: false, error: new Error("Invite ID est requis") };
   }
   console.log("joinGroup called with inviteId:", inviteId);
@@ -74,7 +75,8 @@ export async function joinGroup(inviteId: string) {
   
   (await getUserGroups()).forEach((g) => {
     if (g.id === groupId.data?.id) {
-      throw new Error("Vous êtes déjà membre de ce groupe");
+      Alert.alert("Déjà membre", "Vous êtes déjà membre de ce groupe");
+      return { success: false, error: new Error("Déjà membre") };
     }
   });
   
@@ -83,10 +85,13 @@ export async function joinGroup(inviteId: string) {
       inviteid: inviteId,
       userid: user.id,
     });
-    if (error) throw error;
+    if (error) {
+      Alert.alert("Erreur", "Impossible de rejoindre le groupe.");
+      throw error;
+    }
     return { success: true };
   } catch (error) {
-    console.error("Erreur joinGroup:", error);
+    Alert.alert("Erreur", "Impossible de rejoindre le groupe.");
     return { success: false, error };
   }
 }
@@ -97,7 +102,8 @@ export async function registerEvent(title: string, start: Date, end: Date) {
     const groups = await getUserGroups();
 
     if (!groups || groups.length === 0) {
-      throw new Error("Aucun groupe trouvé");
+      Alert.alert("Aucun groupe", "Vous devez être membre d'un groupe pour créer un événement.");
+      return { success: false, error: new Error("Aucun groupe trouvé") };
     }
 
     // 2. Insertion
@@ -113,7 +119,7 @@ export async function registerEvent(title: string, start: Date, end: Date) {
     if (insertError) throw insertError;
     return { success: true };
   } catch (error) {
-    console.error("Erreur registerEvent:", error);
+    Alert.alert("Erreur", "Impossible de sauvegarder l'événement.");
     return { success: false, error };
   }
 }
@@ -138,7 +144,7 @@ export async function getRemoteEvents() {
       end: new Date(e.end_date),
     }));
   } catch (error) {
-    console.error("Erreur getRemoteEvents:", error);
+    Alert.alert("Erreur", "Impossible de récupérer les événements.");
     return [];
   }
 }
