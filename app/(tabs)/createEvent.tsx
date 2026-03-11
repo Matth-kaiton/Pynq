@@ -65,8 +65,8 @@ export function CreateEvent({
   }, []);
 
   const handleSubmit = async () => {
-    if (!selectedGroup) {
-      Alert.alert("Erreur", "Veuillez sélectionner un groupe");
+    if (!text || !selectedGroup) {
+      Alert.alert("Erreur", "Veuillez remplir les informations de début.");
       return;
     }
 
