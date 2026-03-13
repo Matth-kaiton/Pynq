@@ -95,8 +95,6 @@ export async function joinGroup(inviteId: string) {
   }
   console.log("joinGroup called with inviteId:", inviteId);
 
-  const user = await getUser();
-
   const groupId = await supabase
     .from("groups")
     .select("id")
@@ -113,7 +111,6 @@ export async function joinGroup(inviteId: string) {
   try {
     const { error } = await supabase.rpc("add_member_to_group", {
       inviteid: inviteId,
-      userid: user.id,
     });
     if (error) {
       Alert.alert("Erreur", "Impossible de rejoindre le groupe.");
