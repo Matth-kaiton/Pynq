@@ -195,3 +195,22 @@ export async function getRemoteEvents(groupId?: string) {
     return [];
   }
 }
+
+export async function leaveGroup(groupId?: string) {
+  try {
+    const user = await getUser();
+
+    const { error } = await supabase.rpc("remove_member_from_group", {
+      group_id: groupId,
+      user_id: user.id,
+    });
+
+    if (error) throw error;
+    Alert.alert("Succès", "Vous avez quitté le groupe.");
+    return { success: true };
+  } catch (error) {
+    console.log(error);
+    Alert.alert("Erreur", "Impossible de quitter le groupe.");
+    return { success: false, error };
+  }
+}
