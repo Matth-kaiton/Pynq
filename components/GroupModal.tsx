@@ -16,6 +16,7 @@ function formCreateGroup(
   groupDescription: string,
   setGroupDescription: (text: string) => void,
   setCreatingGroup: (creating: boolean) => void,
+  setModalVisible: (visible: boolean) => void,
 ) {
   return (
     <View>
@@ -41,7 +42,10 @@ function formCreateGroup(
 
       <Pressable
         style={styles.button}
-        onPress={() => createGroup(groupName, groupDescription)}
+        onPress={async () => {
+          if (await createGroup(groupName, groupDescription))
+            setModalVisible(false);
+        }}
       >
         <ThemedText>Créer</ThemedText>
       </Pressable>
@@ -62,6 +66,7 @@ function formJoinGroup(
   inviteId: string,
   setInviteId: (text: string) => void,
   setCreatingGroup: (creating: boolean) => void,
+  setModalVisible: (visible: boolean) => void,
 ) {
   return (
     <View>
@@ -77,7 +82,12 @@ function formJoinGroup(
         onChangeText={setInviteId}
       />
 
-      <Pressable style={styles.button} onPress={() => joinGroup(inviteId)}>
+      <Pressable
+        style={styles.button}
+        onPress={async () => {
+          if (await joinGroup(inviteId)) setModalVisible(false);
+        }}
+      >
         <ThemedText>Rejoindre</ThemedText>
       </Pressable>
 
@@ -107,9 +117,15 @@ export default function GroupModal() {
       groupDescription,
       setGroupDescription,
       setCreatingGroup,
+      setModalVisible,
     );
   } else {
-    form = formJoinGroup(inviteId, setInviteId, setCreatingGroup);
+    form = formJoinGroup(
+      inviteId,
+      setInviteId,
+      setCreatingGroup,
+      setModalVisible,
+    );
   }
 
   return (

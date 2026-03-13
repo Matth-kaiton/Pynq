@@ -51,6 +51,7 @@ export async function createGroup(name: string, description: string) {
     Alert.alert("Champ vide", "Le nom du groupe est requis");
     return { success: false, error: new Error("Le nom du groupe est requis") };
   }
+  console.log("createGroup called with name:", name, "description:", description);
 
   try {
     const user = await getUser();
@@ -79,6 +80,7 @@ export async function createGroup(name: string, description: string) {
       .eq("id", data?.[0]?.id);
 
     if (updateError) throw updateError;
+    Alert.alert("Succès", "Groupe créé avec succès !");
     return { success: true };
   } catch (error) {
     Alert.alert("Erreur", "Impossible de créer le groupe.");
@@ -117,6 +119,7 @@ export async function joinGroup(inviteId: string) {
       Alert.alert("Erreur", "Impossible de rejoindre le groupe.");
       throw error;
     }
+    Alert.alert("Succès", "Vous avez rejoint le groupe !");
     return { success: true };
   } catch (error) {
     Alert.alert("Erreur", "Impossible de rejoindre le groupe.");
