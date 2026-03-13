@@ -34,18 +34,6 @@ export function CreateEvent({
   } | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
 
-  // States pour les dates (initialisés vides)
-  // const [startYear, setStartYear] = useState("");
-  // const [endYear, setEndYear] = useState("");
-  // const [startMonth, setStartMonth] = useState("");
-  // const [endMonth, setEndMonth] = useState("");
-  // const [startDay, setStartDay] = useState("");
-  // const [endDay, setEndDay] = useState("");
-  // const [startT, setStartT] = useState("");
-  // const [endT, setEndT] = useState("");
-  // const [startTM, setStartTM] = useState("");
-  // const [endTM, setEndTM] = useState("");
-
   const [selectedDate, setSelectedDate] = useState(new Date(initialDate));
   const [endDate, setEndDate] = useState(new Date(initialDate));
   const [isEndDate, setIsEndDate] = useState(false);

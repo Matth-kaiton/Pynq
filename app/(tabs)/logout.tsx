@@ -10,7 +10,7 @@ export default function LogoutScreen() {
   useEffect(() => {
     signOut();
     router.replace("/login");
-  }, []);
+  });
 
   return (
     <View style={{ flex: 1, justifyContent: "center" }}>
