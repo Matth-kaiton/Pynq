@@ -81,7 +81,7 @@ export async function createGroup(name: string, description: string) {
 
     if (updateError) throw updateError;
     Alert.alert("Succès", "Groupe créé avec succès !");
-    return { success: true };
+    return { success: true, id: data?.[0]?.id };
   } catch (error) {
     Alert.alert("Erreur", "Impossible de créer le groupe.");
     return { success: false, error };
@@ -120,7 +120,7 @@ export async function joinGroup(inviteId: string) {
       throw error;
     }
     Alert.alert("Succès", "Vous avez rejoint le groupe !");
-    return { success: true };
+    return { success: true, id: groupId.data?.id };
   } catch (error) {
     Alert.alert("Erreur", "Impossible de rejoindre le groupe.");
     return { success: false, error };

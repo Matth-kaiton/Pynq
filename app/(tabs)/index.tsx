@@ -17,10 +17,21 @@ import {
   View,
 } from "react-native";
 
-export let setGroups: React.Dispatch<React.SetStateAction<{
+export let setGroups: React.Dispatch<
+  React.SetStateAction<
+    {
+      id: string;
+      name: string;
+    }[]
+  >
+>;
+
+export let selectGroup: React.Dispatch<
+  React.SetStateAction<{
     id: string;
     name: string;
-}[]>>;
+  } | null>
+>;
 
 export default function CalendarScreen() {
   const { user } = useAuth();
