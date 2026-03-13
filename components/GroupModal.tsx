@@ -1,5 +1,5 @@
 import { ThemedText } from "@/components/themed-text";
-import { createGroup, joinGroup } from "@/servicies/db_queries";
+import { createGroup, joinGroup, getUserGroups } from "@/servicies/db_queries";
 import { styles } from "@/style/style";
 import { JSX, useState } from "react";
 import {
