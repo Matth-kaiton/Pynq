@@ -24,6 +24,7 @@ const MAPPING = {
   plus: "add",
   "plus.circle": "add-circle",
   "plus.circle.fill": "add-circle",
+  "rectangle.portrait.and.arrow.right": "logout",
 } as IconMapping;
 
 /**

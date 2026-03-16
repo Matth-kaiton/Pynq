@@ -3,8 +3,9 @@ import "react-native-reanimated";
 import { useAuth } from "@/components/AuthContext";
 import GroupModal from "@/components/GroupModal";
 import { ThemedText } from "@/components/themed-text";
+import { IconSymbol } from "@/components/ui/icon-symbol";
 import { ShowCalendar } from "@/servicies/big_calendar";
-import { getGroupInviteId, getUserGroups } from "@/servicies/db_queries";
+import { getGroupInviteId, getUserGroups, leaveGroup } from "@/servicies/db_queries";
 import { styles } from "@/style/style";
 import { useEffect, useState } from "react";
 import {
@@ -17,10 +18,36 @@ import {
   View,
 } from "react-native";
 
-export let setGroups: React.Dispatch<React.SetStateAction<{
+export let setGroups: React.Dispatch<
+  React.SetStateAction<
+    {
+      id: string;
+      name: string;
+    }[]
+  >
+>;
+
+export let selectGroup: React.Dispatch<
+  React.SetStateAction<{
     id: string;
     name: string;
-}[]>>;
+  } | null>
+>;
+
+async function leave(id?: string) {
+  Alert.alert("Confirmer", "Êtes-vous sûr de vouloir quitter ce groupe ?", [
+    { text: "Annuler" },
+    {
+      text: "Quitter",
+      onPress: async () => {
+        await leaveGroup(id);
+      },
+    },
+  ]);
+  const groups = await getUserGroups();
+  setGroups(groups);
+  selectGroup(groups[0]);
+}
 
 export default function CalendarScreen() {
   const { user } = useAuth();
@@ -33,6 +60,8 @@ export default function CalendarScreen() {
     id: string;
     name: string;
   } | null>(null);
+  selectGroup = setSelectedGroupCalendar;
+
   const [isModalVisibleCalendar, setIsModalVisibleCalendar] = useState(false);
 
   const handleShareGroup = async () => {
@@ -96,7 +125,7 @@ export default function CalendarScreen() {
             </ThemedText>
           </TouchableOpacity>
           {selectedGroupCalendar && (
-            <TouchableOpacity
+            <><TouchableOpacity
               style={[
                 styles.card,
                 { justifyContent: "center", paddingHorizontal: 15 },
@@ -104,7 +133,20 @@ export default function CalendarScreen() {
               onPress={handleShareGroup}
             >
               <ThemedText style={{ fontSize: 20 }}>🔗</ThemedText>
-            </TouchableOpacity>
+            </TouchableOpacity><TouchableOpacity
+              style={[
+                styles.card,
+                { justifyContent: "center", paddingHorizontal: 15 },
+              ]}
+              onPress={() => {
+                leave(selectedGroupCalendar?.id);
+              } }
+            >
+                <IconSymbol
+                  size={28}
+                  name="rectangle.portrait.and.arrow.right"
+                  color="red" />
+              </TouchableOpacity></>
           )}
         </View>
       </View>

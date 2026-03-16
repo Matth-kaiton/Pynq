@@ -9,6 +9,14 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { setGroups, selectGroup } from "../app/(tabs)/index";
+
+async function addGroupToList(id: string) {
+  const userGroups = await getUserGroups();
+  setGroups(userGroups);
+  const newGroup = userGroups.find((g) => g.id === id);
+  if (newGroup) selectGroup(newGroup);
+}
 
 function formCreateGroup(
   groupName: string,
@@ -43,8 +51,9 @@ function formCreateGroup(
       <Pressable
         style={styles.button}
         onPress={async () => {
-          if (await createGroup(groupName, groupDescription))
-            setModalVisible(false);
+          const result = await createGroup(groupName, groupDescription);
+          if (result.success) await addGroupToList(result.id);
+          setModalVisible(false);
         }}
       >
         <ThemedText>Créer</ThemedText>
@@ -85,7 +94,9 @@ function formJoinGroup(
       <Pressable
         style={styles.button}
         onPress={async () => {
-          if (await joinGroup(inviteId)) setModalVisible(false);
+          const result = await joinGroup(inviteId);
+          if (result.success) await addGroupToList(result.id);
+          setModalVisible(false);
         }}
       >
         <ThemedText>Rejoindre</ThemedText>
