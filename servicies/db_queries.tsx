@@ -51,12 +51,17 @@ export async function createGroup(name: string, description: string) {
     Alert.alert("Champ vide", "Le nom du groupe est requis");
     return { success: false, error: new Error("Le nom du groupe est requis") };
   }
-  console.log("createGroup called with name:", name, "description:", description);
+  console.log(
+    "createGroup called with name:",
+    name,
+    "description:",
+    description,
+  );
 
   try {
     const user = await getUser();
 
-    const { data, error: insertError } = await supabase
+    const { data: createdGroup, error: insertError } = await supabase
       .from("groups")
       .insert([
         {
@@ -67,21 +72,31 @@ export async function createGroup(name: string, description: string) {
           admins: [user.id],
         },
       ])
-      .select("id");
+      .select("id")
+      .single();
 
-    if (insertError) throw insertError;
+    if (insertError || !createdGroup?.id)
+      throw insertError ?? new Error("Création du groupe échouée");
 
-    const inviteId = name + data?.[0]?.id;
+    const normalizedName = name.trim().toLowerCase().replace(/\s+/g, "-");
+    const inviteId = `${normalizedName}-${Math.floor(Math.random() * 10000)}`;
+
     const { error: updateError } = await supabase
       .from("groups")
       .update({
         invite_id: inviteId,
       })
-      .eq("id", data?.[0]?.id);
+      .eq("id", createdGroup.id);
 
     if (updateError) throw updateError;
     Alert.alert("Succès", "Groupe créé avec succès !");
-    return { success: true, id: data?.[0]?.id };
+    console.log(
+      "Groupe créé avec ID:",
+      createdGroup.id,
+      "Invite ID:",
+      inviteId,
+    );
+    return { success: true, id: createdGroup.id };
   } catch (error) {
     Alert.alert("Erreur", "Impossible de créer le groupe.");
     return { success: false, error };
@@ -95,18 +110,25 @@ export async function joinGroup(inviteId: string) {
   }
   console.log("joinGroup called with inviteId:", inviteId);
 
-  const groupId = await supabase
+  const { data: group, error: groupError } = await supabase
     .from("groups")
     .select("id")
     .eq("invite_id", inviteId)
     .single();
 
-  (await getUserGroups()).forEach((g) => {
-    if (g.id === groupId.data?.id) {
-      Alert.alert("Déjà membre", "Vous êtes déjà membre de ce groupe");
-      return { success: false, error: new Error("Déjà membre") };
-    }
-  });
+  if (groupError || !group) {
+    Alert.alert("Erreur", "Groupe introuvable.");
+    return {
+      success: false,
+      error: groupError ?? new Error("Groupe introuvable"),
+    };
+  }
+
+  const userGroups = await getUserGroups();
+  if (userGroups.some((g) => g.id === group.id)) {
+    Alert.alert("Déjà membre", "Vous êtes déjà membre de ce groupe");
+    return { success: false, error: new Error("Déjà membre") };
+  }
 
   try {
     const { error } = await supabase.rpc("add_member_to_group", {
@@ -117,7 +139,7 @@ export async function joinGroup(inviteId: string) {
       throw error;
     }
     Alert.alert("Succès", "Vous avez rejoint le groupe !");
-    return { success: true, id: groupId.data?.id };
+    return { success: true, id: group.id };
   } catch (error) {
     Alert.alert("Erreur", "Impossible de rejoindre le groupe.");
     return { success: false, error };
@@ -194,6 +216,11 @@ export async function getRemoteEvents(groupId?: string) {
 }
 
 export async function leaveGroup(groupId?: string) {
+  if (!groupId) {
+    Alert.alert("Erreur", "Identifiant de groupe manquant.");
+    return { success: false, error: new Error("Group ID manquant") };
+  }
+
   try {
     const user = await getUser();
 
