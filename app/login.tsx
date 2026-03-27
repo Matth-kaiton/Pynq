@@ -1,7 +1,7 @@
 import { useAuth } from "@/components/AuthContext";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import { isUsernameTaken } from "@/servicies/db_queries";
+import { isUsernameTaken, getEmailByUsername } from "@/servicies/db_queries";
 import { styles } from "@/style/style";
 import { router } from "expo-router";
 import { useState } from "react";
@@ -78,6 +78,28 @@ export default function Login() {
       }
     } else {
       setLoading(true);
+      try {
+        let loginEmail = email;
+
+        // if the input doesn't look like an email, treat it as a username
+        if (!email.includes("@") && !email.includes(".")) {
+          const fetchedEmail = await getEmailByUsername(email);
+          if (!fetchedEmail) {
+            Alert.alert("Erreur", "Nom d'utilisateur introuvable.");
+            setLoading(false);
+            return;
+          }
+          loginEmail = fetchedEmail;
+        }
+
+        await signIn(loginEmail, password);
+        router.replace("/(tabs)");
+      } catch (error: any) {
+        Alert.alert("Erreur", "Email ou mot de passe incorrect.");
+      } finally {
+        setLoading(false);
+      }
+      return; // Fin du bloc signIn
     }
 
     try {
@@ -87,9 +109,6 @@ export default function Login() {
           "Succès",
           "Vérifiez votre email pour confirmer votre compte!",
         );
-      } else {
-        await signIn(email, password);
-        router.replace("/(tabs)");
       }
     } catch (error: any) {
       Alert.alert("Erreur", error.message);
@@ -134,17 +153,19 @@ export default function Login() {
         )}
 
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>Email</Text>
+          <Text style={styles.label}>
+            {isSignUp ? "Email" : "Email ou Nom d'utilisateur"}
+          </Text>
           <TextInput
             style={[
               styles.input,
               { color: "#000", backgroundColor: "rgba(0,0,0,0)" },
             ]}
-            placeholder="email@exemple.com"
+            placeholder={isSignUp ? "email@exemple.com" : "email@exemple.com ou pseudo"}
             value={email}
             onChangeText={setEmail}
             autoCapitalize="none"
-            keyboardType="email-address"
+            keyboardType={isSignUp ? "email-address" : "default"}
           />
         </View>
 

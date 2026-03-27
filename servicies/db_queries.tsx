@@ -1,6 +1,25 @@
 import { supabase } from "@/lib/supabase";
 import { Alert } from "react-native";
 
+export async function getEmailByUsername(username: string) {
+  try {
+    const { data, error } = await supabase
+      .from("profiles") // Replace with your profiles table name if different
+      .select("email")  // Assumes you have an email column in profiles to reverse-lookup
+      .eq("username", username)
+      .limit(1);
+
+    if (error || !data || data.length === 0) {
+      return null;
+    }
+    
+    return data[0].email;
+  } catch (error) {
+    console.error("Catch error getting email by username:", error);
+    return null;
+  }
+}
+
 export async function isUsernameTaken(username: string) {
   try {
     const { data, error } = await supabase
