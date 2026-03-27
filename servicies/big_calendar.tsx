@@ -3,6 +3,7 @@ import { modal } from "@/style/modal";
 import { styles } from "@/style/style";
 import base from "@/style/theme.json";
 import { useFocusEffect } from "@react-navigation/native";
+import "dayjs/locale/fr";
 import { AlignLeft, Clock, X } from "lucide-react-native";
 import React, { useCallback, useRef, useState } from "react";
 import {
@@ -153,6 +154,7 @@ export function ShowCalendar({ selectedGroupId }: ShowCalendarProps) {
           }}
           mode="3days"
           swipeEnabled={false}
+          locale="fr"
           onPressEvent={(event) => {
             setSelectedEvent(event);
             setIsModalVisible(true);
