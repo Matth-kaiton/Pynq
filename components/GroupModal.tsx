@@ -1,5 +1,5 @@
 import { ThemedText } from "@/components/themed-text";
-import { createGroup, joinGroup } from "@/servicies/db_queries";
+import { createGroup, joinGroup, getUserGroups } from "@/servicies/db_queries";
 import { styles } from "@/style/style";
 import { JSX, useState } from "react";
 import {
@@ -9,6 +9,14 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { setGroups, selectGroup } from "../app/(tabs)/index";
+
+async function addGroupToList(id: string) {
+  const userGroups = await getUserGroups();
+  setGroups(userGroups);
+  const newGroup = userGroups.find((g) => g.id === id);
+  if (newGroup) selectGroup(newGroup);
+}
 
 function formCreateGroup(
   groupName: string,
@@ -16,6 +24,7 @@ function formCreateGroup(
   groupDescription: string,
   setGroupDescription: (text: string) => void,
   setCreatingGroup: (creating: boolean) => void,
+  setModalVisible: (visible: boolean) => void,
 ) {
   return (
     <View>
@@ -41,7 +50,11 @@ function formCreateGroup(
 
       <Pressable
         style={styles.button}
-        onPress={() => createGroup(groupName, groupDescription)}
+        onPress={async () => {
+          const result = await createGroup(groupName, groupDescription);
+          if (result.success) await addGroupToList(result.id);
+          setModalVisible(false);
+        }}
       >
         <ThemedText>Créer</ThemedText>
       </Pressable>
@@ -62,6 +75,7 @@ function formJoinGroup(
   inviteId: string,
   setInviteId: (text: string) => void,
   setCreatingGroup: (creating: boolean) => void,
+  setModalVisible: (visible: boolean) => void,
 ) {
   return (
     <View>
@@ -77,7 +91,14 @@ function formJoinGroup(
         onChangeText={setInviteId}
       />
 
-      <Pressable style={styles.button} onPress={() => joinGroup(inviteId)}>
+      <Pressable
+        style={styles.button}
+        onPress={async () => {
+          const result = await joinGroup(inviteId);
+          if (result.success) await addGroupToList(result.id);
+          setModalVisible(false);
+        }}
+      >
         <ThemedText>Rejoindre</ThemedText>
       </Pressable>
 
@@ -107,9 +128,15 @@ export default function GroupModal() {
       groupDescription,
       setGroupDescription,
       setCreatingGroup,
+      setModalVisible,
     );
   } else {
-    form = formJoinGroup(inviteId, setInviteId, setCreatingGroup);
+    form = formJoinGroup(
+      inviteId,
+      setInviteId,
+      setCreatingGroup,
+      setModalVisible,
+    );
   }
 
   return (

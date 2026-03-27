@@ -3,104 +3,66 @@ import "react-native-reanimated";
 import { useAuth } from "@/components/AuthContext";
 import GroupModal from "@/components/GroupModal";
 import { ThemedText } from "@/components/themed-text";
+import { IconSymbol } from "@/components/ui/icon-symbol";
 import { ShowCalendar } from "@/servicies/big_calendar";
-import { getGroupInviteId, getUserGroups } from "@/servicies/db_queries";
+import { getGroupInviteId, getUserGroups, leaveGroup } from "@/servicies/db_queries";
 import { styles } from "@/style/style";
-import * as Calendar from "expo-calendar";
-import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   Alert,
   FlatList,
   Modal,
-  Platform,
   Share,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
 
-async function getDefaultCalendarSource() {
-  const defaultCalendar = await Calendar.getDefaultCalendarAsync();
-  return defaultCalendar.source;
-}
+export let setGroups: React.Dispatch<
+  React.SetStateAction<
+    {
+      id: string;
+      name: string;
+    }[]
+  >
+>;
 
-async function deleteExpoCalendars() {
-  try {
-    const calendars = await Calendar.getCalendarsAsync(
-      Calendar.EntityTypes.EVENT,
-    );
-    let deletedCount = 0;
-    for (const calendar of calendars) {
-      if (calendar.title === "Expo Calendar") {
-        await Calendar.deleteCalendarAsync(calendar.id);
-        console.log(`Deleted calendar with id: ${calendar.id}`);
-        deletedCount++;
-      }
-    }
-    console.log(`Deleted ${deletedCount} calendars.`);
-  } catch (err) {
-    console.error("deleteCalendars failed", err);
-  }
-}
+export let selectGroup: React.Dispatch<
+  React.SetStateAction<{
+    id: string;
+    name: string;
+  } | null>
+>;
 
-async function createCalendar() {
-  try {
-    let source;
-    if (Platform.OS === "ios") {
-      const defaultCalendar = await Calendar.getDefaultCalendarAsync();
-      source = defaultCalendar?.source ?? {
-        name: "Expo Calendar",
-        isLocalAccount: true,
-      };
-    } else {
-      source = { isLocalAccount: true, name: "Expo Calendar" };
-    }
-
-    const calendarParams: any = {
-      title: "Expo Calendar",
-      color: "blue",
-      entityType: Calendar.EntityTypes.EVENT,
-      name: "internalCalendarName",
-      source,
-      ownerAccount: "personal",
-      accessLevel: Calendar.CalendarAccessLevel.OWNER, // required
-    };
-
-    if (Platform.OS === "ios") {
-      if (source && typeof (source as any).id !== "undefined") {
-        calendarParams.sourceId = (source as any).id;
-      }
-      calendarParams.ownerAccount = "personal";
-    }
-
-    const newCalendarID = await Calendar.createCalendarAsync(calendarParams);
-    console.log(`Your new calendar ID is: ${newCalendarID}`);
-  } catch (err) {
-    console.error("createCalendar failed", err);
-  }
+async function leave(id?: string) {
+  Alert.alert("Confirmer", "Êtes-vous sûr de vouloir quitter ce groupe ?", [
+    { text: "Annuler" },
+    {
+      text: "Quitter",
+      onPress: async () => {
+        await leaveGroup(id);
+      },
+    },
+  ]);
+  const groups = await getUserGroups();
+  setGroups(groups);
+  selectGroup(groups[0]);
 }
 
 export default function CalendarScreen() {
-  const { signOut, user } = useAuth();
+  const { user } = useAuth();
   const [groupsCalendar, setGroupsCalendar] = useState<
     { id: string; name: string }[]
   >([]);
+  setGroups = setGroupsCalendar;
+
   const [selectedGroupCalendar, setSelectedGroupCalendar] = useState<{
     id: string;
     name: string;
   } | null>(null);
-  const [isModalVisibleCalendar, setIsModalVisibleCalendar] = useState(false);
+  selectGroup = setSelectedGroupCalendar;
 
-  const handleSignOut = async () => {
-    try {
-      await signOut();
-      console.log("User signed out");
-      router.replace("../login");
-    } catch (error) {
-      console.error("Sign out failed", error);
-    }
-  };
+  const [isModalVisibleCalendar, setIsModalVisibleCalendar] = useState(false);
 
   const handleShareGroup = async () => {
     if (!selectedGroupCalendar) {
@@ -163,7 +125,7 @@ export default function CalendarScreen() {
             </ThemedText>
           </TouchableOpacity>
           {selectedGroupCalendar && (
-            <TouchableOpacity
+            <><TouchableOpacity
               style={[
                 styles.card,
                 { justifyContent: "center", paddingHorizontal: 15 },
@@ -171,7 +133,20 @@ export default function CalendarScreen() {
               onPress={handleShareGroup}
             >
               <ThemedText style={{ fontSize: 20 }}>🔗</ThemedText>
-            </TouchableOpacity>
+            </TouchableOpacity><TouchableOpacity
+              style={[
+                styles.card,
+                { justifyContent: "center", paddingHorizontal: 15 },
+              ]}
+              onPress={() => {
+                leave(selectedGroupCalendar?.id);
+              } }
+            >
+                <IconSymbol
+                  size={28}
+                  name="rectangle.portrait.and.arrow.right"
+                  color="red" />
+              </TouchableOpacity></>
           )}
         </View>
       </View>
@@ -232,13 +207,6 @@ export default function CalendarScreen() {
         </View>
       </Modal>
       <GroupModal />
-      {/*
-      <Pressable style={styles.button} onPress={() => createCalendar()}>
-        <Text style={styles.title}>Create a new calendar</Text>
-      </Pressable>
-      <Pressable style={styles.button} onPress={() => deleteExpoCalendars()}>
-        <Text style={styles.title}>Delete Expo Calendars</Text>
-      </Pressable> */}
     </View>
   );
 }
