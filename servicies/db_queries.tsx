@@ -1,6 +1,26 @@
 import { supabase } from "@/lib/supabase";
 import { Alert } from "react-native";
 
+export async function isUsernameTaken(username: string) {
+  try {
+    const { data, error } = await supabase
+      .from("profiles") // Replace with your users or profiles table name
+      .select("username")
+      .eq("username", username)
+      .limit(1);
+
+    if (error) {
+      console.error("Error checking username:", error);
+      return true; // Assuming not taken if we can't verify, or true to be safe
+    }
+
+    return data && data.length > 0;
+  } catch (error) {
+    console.error("Catch error checking username:", error);
+    return true;
+  }
+}
+
 async function getUser() {
   const {
     data: { user },

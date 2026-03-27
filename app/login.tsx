@@ -1,6 +1,7 @@
 import { useAuth } from "@/components/AuthContext";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
+import { isUsernameTaken } from "@/servicies/db_queries";
 import { styles } from "@/style/style";
 import { router } from "expo-router";
 import { useState } from "react";
@@ -61,9 +62,24 @@ export default function Login() {
         );
         return;
       }
+
+      setLoading(true);
+      try {
+        const taken = await isUsernameTaken(username);
+        if (taken) {
+          Alert.alert("Erreur", "Nom d'utilisateur déjà pris.");
+          setLoading(false);
+          return;
+        }
+      } catch (error: any) {
+        Alert.alert("Erreur", "Vérification du nom d'utilisateur a échoué.");
+        setLoading(false);
+        return;
+      }
+    } else {
+      setLoading(true);
     }
 
-    setLoading(true);
     try {
       if (isSignUp) {
         await signUp(email, password, username);
