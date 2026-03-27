@@ -53,25 +53,35 @@ export default function Login() {
         {isSignUp ? "Inscription" : "Connexion"}
       </ThemedText>
 
-      <View style={[styles.card, { width: "100%", height: "25%" }]}>
+      <View style={[styles.card, { width: "100%", height: "31%" }]}>
+        <Text
+          style={{color: "#000", fontWeight: "normal", fontSize: 20 }}
+        >
+          Email
+        </Text>
         <TextInput
           style={[
             styles.input,
             { color: "#000", backgroundColor: "rgba(0,0,0,0)" },
           ]}
-          placeholder="Email"
+          placeholder="email@exemple.com"
           value={email}
           onChangeText={setEmail}
           autoCapitalize="none"
           keyboardType="email-address"
         />
 
+        <Text
+          style={{color: "#000", fontWeight: "normal", fontSize: 20 }}
+        >
+          Mot de passe
+        </Text>
         <TextInput
           style={[
             styles.input,
             { color: "#000", backgroundColor: "rgba(0,0,0,0)" },
           ]}
-          placeholder="Mot de passe"
+          placeholder="MotDePasse@123"
           value={password}
           onChangeText={setPassword}
           secureTextEntry
