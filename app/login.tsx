@@ -7,19 +7,25 @@ import { useState } from "react";
 import { Alert, Pressable, Text, TextInput, View } from "react-native";
 
 export default function Login() {
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
   const { signIn, signUp, signInAsGuest } = useAuth();
 
   const handleAuth = async () => {
-    if (!email || !password) {
+    if (!email || !password || (isSignUp && (!username || !confirmPassword))) {
       Alert.alert("Erreur", "Veuillez remplir tous les champs.");
       return;
     }
 
     if (isSignUp) {
+      if (password !== confirmPassword) {
+        Alert.alert("Erreur", "Les mots de passe ne correspondent pas.");
+        return;
+      }
       if (password.length < 8) {
         Alert.alert(
           "Mot de passe faible",
@@ -60,7 +66,7 @@ export default function Login() {
     setLoading(true);
     try {
       if (isSignUp) {
-        await signUp(email, password);
+        await signUp(email, password, username);
         Alert.alert(
           "Succès",
           "Vérifiez votre email pour confirmer votre compte!",
@@ -94,35 +100,67 @@ export default function Login() {
         {isSignUp ? "Inscription" : "Connexion"}
       </ThemedText>
 
-      <View style={[styles.card, { width: "100%", height: "31%" }]}>
-        <Text style={{ color: "#000", fontWeight: "normal", fontSize: 20 }}>
-          Email
-        </Text>
-        <TextInput
-          style={[
-            styles.input,
-            { color: "#000", backgroundColor: "rgba(0,0,0,0)" },
-          ]}
-          placeholder="email@exemple.com"
-          value={email}
-          onChangeText={setEmail}
-          autoCapitalize="none"
-          keyboardType="email-address"
-        />
+      <View style={[styles.card, { width: "100%", height: "auto" }]}>
+        {isSignUp && (
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Nom d&apos;utilisateur</Text>
+            <TextInput
+              style={[
+                styles.input,
+                { color: "#000", backgroundColor: "rgba(0,0,0,0)" },
+              ]}
+              placeholder="Votre pseudo"
+              value={username}
+              onChangeText={setUsername}
+              autoCapitalize="none"
+            />
+          </View>
+        )}
 
-        <Text style={{ color: "#000", fontWeight: "normal", fontSize: 20 }}>
-          Mot de passe
-        </Text>
-        <TextInput
-          style={[
-            styles.input,
-            { color: "#000", backgroundColor: "rgba(0,0,0,0)" },
-          ]}
-          placeholder="MotDePasse@123"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-        />
+        <View style={styles.inputGroup}>
+          <Text style={styles.label}>Email</Text>
+          <TextInput
+            style={[
+              styles.input,
+              { color: "#000", backgroundColor: "rgba(0,0,0,0)" },
+            ]}
+            placeholder="email@exemple.com"
+            value={email}
+            onChangeText={setEmail}
+            autoCapitalize="none"
+            keyboardType="email-address"
+          />
+        </View>
+
+        <View style={styles.inputGroup}>
+          <Text style={styles.label}>Mot de passe</Text>
+          <TextInput
+            style={[
+              styles.input,
+              { color: "#000", backgroundColor: "rgba(0,0,0,0)" },
+            ]}
+            placeholder="MotDePasse@123"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+          />
+        </View>
+
+        {isSignUp && (
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Confirmer le mot de passe</Text>
+            <TextInput
+              style={[
+                styles.input,
+                { color: "#000", backgroundColor: "rgba(0,0,0,0)" },
+              ]}
+              placeholder="MotDePasse@123"
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              secureTextEntry
+            />
+          </View>
+        )}
       </View>
 
       <Pressable style={styles.button} onPress={handleAuth} disabled={loading}>

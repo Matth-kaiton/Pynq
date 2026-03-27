@@ -33,7 +33,7 @@ function formCreateGroup(
       </ThemedText>
 
       <TextInput
-        style={[styles.input, { color: "#000", flex: undefined }]}
+        style={[styles.input, { color: "#000" }]}
         placeholder="Nom du groupe"
         placeholderTextColor="#999"
         value={groupName}
@@ -41,7 +41,7 @@ function formCreateGroup(
       />
 
       <TextInput
-        style={[styles.input, { color: "#000", flex: undefined }]}
+        style={[styles.input, { color: "#000" }]}
         placeholder="Description"
         placeholderTextColor="#999"
         value={groupDescription}
@@ -84,7 +84,7 @@ function formJoinGroup(
       </ThemedText>
 
       <TextInput
-        style={[styles.input, { color: "#000", flex: undefined }]}
+        style={[styles.input, { color: "#000" }]}
         placeholder="Invite ID"
         placeholderTextColor="#999"
         value={inviteId}
