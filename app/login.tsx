@@ -55,7 +55,10 @@ export default function Login() {
 
       <View style={[styles.card, { width: "100%", height: "25%" }]}>
         <TextInput
-          style={styles.input}
+          style={[
+            styles.input,
+            { color: "#000", backgroundColor: "rgba(0,0,0,0)" },
+          ]}
           placeholder="Email"
           value={email}
           onChangeText={setEmail}
@@ -64,7 +67,10 @@ export default function Login() {
         />
 
         <TextInput
-          style={styles.input}
+          style={[
+            styles.input,
+            { color: "#000", backgroundColor: "rgba(0,0,0,0)" },
+          ]}
           placeholder="Mot de passe"
           value={password}
           onChangeText={setPassword}
