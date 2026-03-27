@@ -152,8 +152,9 @@ export function ShowCalendar({ selectedGroupId }: ShowCalendarProps) {
             setCreateDate(event);
             setIsCreatModalVisible(true);
           }}
-          mode="3days"
+          mode="schedule"
           swipeEnabled={false}
+          scrollOffsetMinutes={Math.max(0, new Date().getHours() * 60 - 60)} // Scroll to 1 hour before current time
           locale="fr"
           onPressEvent={(event) => {
             setSelectedEvent(event);
@@ -221,7 +222,6 @@ export function ShowCalendar({ selectedGroupId }: ShowCalendarProps) {
                 </Text>
               </View>
             )}
-
           </View>
         </View>
       </Modal>
