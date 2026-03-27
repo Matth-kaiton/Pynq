@@ -22,7 +22,7 @@ interface CreateEventProps {
   initialDate: Date;
 }
 
-export function CreateEvent({
+export default function CreateEvent({
   initialDate,
   onSuccess,
 }: CreateEventProps & { onSuccess: () => void }) {
@@ -287,7 +287,9 @@ export function CreateEvent({
         </Modal>
 
         <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-          <ThemedText style={styles.title}>Enregistrer l'événement</ThemedText>
+          <ThemedText style={styles.title}>
+            Enregistrer l&apos;événement
+          </ThemedText>
         </TouchableOpacity>
       </ThemedView>
     </ScrollView>

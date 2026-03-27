@@ -1,4 +1,4 @@
-import { CreateEvent } from "@/app/(tabs)/createEvent";
+import CreateEvent from "@/app/(tabs)/createEvent";
 import { modal } from "@/style/modal";
 import { styles } from "@/style/style";
 import base from "@/style/theme.json";
