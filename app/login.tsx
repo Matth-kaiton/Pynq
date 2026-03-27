@@ -50,7 +50,7 @@ export default function Login() {
   return (
     <ThemedView style={styles.container}>
       <ThemedText type="title" style={[styles.label, { fontSize: 30 }]}>
-        {isSignUp ? "Sign Up" : "Sign In"}
+        {isSignUp ? "Inscription" : "Connexion"}
       </ThemedText>
 
       <View style={[styles.card, { width: "100%", height: "25%" }]}>
@@ -65,7 +65,7 @@ export default function Login() {
 
         <TextInput
           style={styles.input}
-          placeholder="Password"
+          placeholder="Mot de passe"
           value={password}
           onChangeText={setPassword}
           secureTextEntry
@@ -74,20 +74,20 @@ export default function Login() {
 
       <Pressable style={styles.button} onPress={handleAuth} disabled={loading}>
         <Text style={styles.title}>
-          {loading ? "Loading..." : isSignUp ? "Sign Up" : "Sign In"}
+          {loading ? "Chargement..." : isSignUp ? "Inscription" : "Connexion"}
         </Text>
       </Pressable>
 
       <Pressable style={styles.button} onPress={() => setIsSignUp(!isSignUp)}>
         <Text style={styles.title}>
           {isSignUp
-            ? "Already have an account? Sign In"
-            : "Don't have an account? Sign Up"}
+            ? "Déjà un compte ? Se connecter"
+            : "Pas de compte ? S'inscrire"}
         </Text>
       </Pressable>
 
       <Pressable style={styles.button} onPress={handleGuest}>
-        <Text style={styles.title}>Continue as Guest</Text>
+        <Text style={styles.title}>Continuer en tant qu&apos;invité</Text>
       </Pressable>
     </ThemedView>
   );

@@ -30,7 +30,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="createEvent"
         options={{
-          title: "Create Events",
+          title: "Créer un événement",
           tabBarIcon: ({ color }) => (
             <IconSymbol size={28} name="plus" color={color} />
           ),
@@ -39,7 +39,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="logout"
         options={{
-          title: "logout",
+          title: "Déconnexion",
           tabBarIcon: () => (
             <DoorOpen size={20} strokeWidth={2} color={"#000"} />
           ),
