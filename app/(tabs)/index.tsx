@@ -104,7 +104,7 @@ export default function CalendarScreen() {
         <ShowCalendar selectedGroupId={selectedGroupCalendar?.id} />
       </View>
       <Text style={styles.label}>
-        {/* User: {user ? user.email : "No user signed in"} */}
+        {user ? user.user_metadata?.display_name || user.email : ""}
       </Text>
       <View style={styles.inputGroup}>
         <ThemedText style={styles.label}>Groupe sélectionné</ThemedText>
