@@ -15,21 +15,62 @@ export default function Login() {
 
   const handleAuth = async () => {
     if (!email || !password) {
-      Alert.alert("Error", "Please fill in all fields");
+      Alert.alert("Erreur", "Veuillez remplir tous les champs.");
       return;
+    }
+
+    if (isSignUp) {
+      if (password.length < 8) {
+        Alert.alert(
+          "Mot de passe faible",
+          "Le mot de passe doit contenir au moins 8 caractères.",
+        );
+        return;
+      }
+      if (!/(?=.*[A-Z])/.test(password)) {
+        Alert.alert(
+          "Mot de passe faible",
+          "Le mot de passe doit contenir au moins une lettre majuscule.",
+        );
+        return;
+      }
+      if (!/(?=.*[a-z])/.test(password)) {
+        Alert.alert(
+          "Mot de passe faible",
+          "Le mot de passe doit contenir au moins une lettre minuscule.",
+        );
+        return;
+      }
+      if (!/(?=.*\d)/.test(password)) {
+        Alert.alert(
+          "Mot de passe faible",
+          "Le mot de passe doit contenir au moins un chiffre.",
+        );
+        return;
+      }
+      if (!/(?=.*[\W_])/.test(password)) {
+        Alert.alert(
+          "Mot de passe faible",
+          "Le mot de passe doit contenir au moins un caractère spécial.",
+        );
+        return;
+      }
     }
 
     setLoading(true);
     try {
       if (isSignUp) {
         await signUp(email, password);
-        Alert.alert("Success", "Check your email to confirm your account!");
+        Alert.alert(
+          "Succès",
+          "Vérifiez votre email pour confirmer votre compte!",
+        );
       } else {
         await signIn(email, password);
         router.replace("/(tabs)");
       }
     } catch (error: any) {
-      Alert.alert("Error", error.message);
+      Alert.alert("Erreur", error.message);
     } finally {
       setLoading(false);
     }
@@ -41,7 +82,7 @@ export default function Login() {
       await signInAsGuest();
       router.replace("/(tabs)");
     } catch (error: any) {
-      Alert.alert("Error", error.message);
+      Alert.alert("Erreur", error.message);
     } finally {
       setLoading(false);
     }
@@ -54,9 +95,7 @@ export default function Login() {
       </ThemedText>
 
       <View style={[styles.card, { width: "100%", height: "31%" }]}>
-        <Text
-          style={{color: "#000", fontWeight: "normal", fontSize: 20 }}
-        >
+        <Text style={{ color: "#000", fontWeight: "normal", fontSize: 20 }}>
           Email
         </Text>
         <TextInput
@@ -71,9 +110,7 @@ export default function Login() {
           keyboardType="email-address"
         />
 
-        <Text
-          style={{color: "#000", fontWeight: "normal", fontSize: 20 }}
-        >
+        <Text style={{ color: "#000", fontWeight: "normal", fontSize: 20 }}>
           Mot de passe
         </Text>
         <TextInput
