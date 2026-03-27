@@ -148,6 +148,7 @@ export async function joinGroup(inviteId: string) {
 
 export async function registerEvent(
   title: string,
+  description: string,
   start: Date,
   end: Date,
   groupId: string,
@@ -168,6 +169,7 @@ export async function registerEvent(
     const { error: insertError } = await supabase.from("events").insert([
       {
         title: title,
+        description: description,
         start_date: start.toISOString(),
         end_date: end.toISOString(),
         group_id: groupId,
@@ -206,6 +208,7 @@ export async function getRemoteEvents(groupId?: string) {
     return eventsGrp.map((e) => ({
       ...e,
       title: e.title || "Sans titre",
+      description: e.description || "Aucune description disponible.",
       start: new Date(e.start_date),
       end: new Date(e.end_date),
     }));

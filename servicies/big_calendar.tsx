@@ -221,14 +221,6 @@ export function ShowCalendar({ selectedGroupId }: ShowCalendarProps) {
                 </Text>
               </View>
             )}
-            {!selectedEvent?.description && (
-              <View style={modal.detailRow}>
-                <AlignLeft size={20} color={base.colors.primary} />
-                <Text style={modal.detailText}>
-                  Aucune description disponible.
-                </Text>
-              </View>
-            )}
 
           </View>
         </View>
