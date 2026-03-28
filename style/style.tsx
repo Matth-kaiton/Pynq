@@ -26,11 +26,10 @@ export const styles = StyleSheet.create({
   },
   input: {
     backgroundColor: base.colors.inputBackground,
-    flex: 1,
+    minHeight: 40,
     padding: 15,
     fontSize: 20,
     borderRadius: 8,
-    marginBottom: 15,
     borderWidth: 1,
     borderColor: base.colors.border,
   },
