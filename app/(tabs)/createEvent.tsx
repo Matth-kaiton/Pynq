@@ -22,11 +22,12 @@ interface CreateEventProps {
   initialDate: Date;
 }
 
-export function CreateEvent({
+export default function CreateEvent({
   initialDate,
   onSuccess,
 }: CreateEventProps & { onSuccess: () => void }) {
   const [text, setText] = useState("");
+  const [description, setDescription] = useState("");
   const [groups, setGroups] = useState<{ id: string; name: string }[]>([]);
   const [selectedGroup, setSelectedGroup] = useState<{
     id: string;
@@ -68,6 +69,7 @@ export function CreateEvent({
 
     const result = await registerEvent(
       text,
+      description,
       finalStart,
       finalEnd,
       selectedGroup.id,
@@ -154,6 +156,16 @@ export function CreateEvent({
               onChange={onChange}
             />
           )}
+        </View>
+
+        <View style={styles.inputGroup}>
+          <ThemedText style={styles.label}>Description</ThemedText>
+          <TextInput
+            style={styles.input}
+            value={description}
+            onChangeText={setDescription}
+            placeholder="Description de l'événement..."
+          />
         </View>
 
         {/* SECTION DEBUT */}
@@ -272,7 +284,7 @@ export function CreateEvent({
                       setIsModalVisible(false);
                     }}
                   >
-                    <ThemedText>{item.name}</ThemedText>
+                    <ThemedText style={{ color: "#000",backgroundColor: "rgba(0,0,0,0)" }}>{item.name}</ThemedText>
                   </TouchableOpacity>
                 )}
               />
@@ -287,7 +299,9 @@ export function CreateEvent({
         </Modal>
 
         <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-          <ThemedText style={styles.title}>Enregistrer l'événement</ThemedText>
+          <ThemedText style={styles.title}>
+            Enregistrer l&apos;événement
+          </ThemedText>
         </TouchableOpacity>
       </ThemedView>
     </ScrollView>

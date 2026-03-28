@@ -1,6 +1,45 @@
 import { supabase } from "@/lib/supabase";
 import { Alert } from "react-native";
 
+export async function getEmailByUsername(username: string) {
+  try {
+    const { data, error } = await supabase
+      .from("profiles") // Replace with your profiles table name if different
+      .select("email")  // Assumes you have an email column in profiles to reverse-lookup
+      .eq("username", username)
+      .limit(1);
+
+    if (error || !data || data.length === 0) {
+      return null;
+    }
+    
+    return data[0].email;
+  } catch (error) {
+    console.error("Catch error getting email by username:", error);
+    return null;
+  }
+}
+
+export async function isUsernameTaken(username: string) {
+  try {
+    const { data, error } = await supabase
+      .from("profiles") // Replace with your users or profiles table name
+      .select("username")
+      .eq("username", username)
+      .limit(1);
+
+    if (error) {
+      console.error("Error checking username:", error);
+      return true; // Assuming not taken if we can't verify, or true to be safe
+    }
+
+    return data && data.length > 0;
+  } catch (error) {
+    console.error("Catch error checking username:", error);
+    return true;
+  }
+}
+
 async function getUser() {
   const {
     data: { user },
@@ -148,6 +187,7 @@ export async function joinGroup(inviteId: string) {
 
 export async function registerEvent(
   title: string,
+  description: string,
   start: Date,
   end: Date,
   groupId: string,
@@ -168,6 +208,7 @@ export async function registerEvent(
     const { error: insertError } = await supabase.from("events").insert([
       {
         title: title,
+        description: description,
         start_date: start.toISOString(),
         end_date: end.toISOString(),
         group_id: groupId,
@@ -206,6 +247,7 @@ export async function getRemoteEvents(groupId?: string) {
     return eventsGrp.map((e) => ({
       ...e,
       title: e.title || "Sans titre",
+      description: e.description || "Aucune description disponible.",
       start: new Date(e.start_date),
       end: new Date(e.end_date),
     }));

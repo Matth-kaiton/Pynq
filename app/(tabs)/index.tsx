@@ -100,14 +100,14 @@ export default function CalendarScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={[styles.calendar, { flex: 1 }]}>
+      <View style={{ flex: 1 }}>
         <ShowCalendar selectedGroupId={selectedGroupCalendar?.id} />
       </View>
       <Text style={styles.label}>
-        User: {user ? user.email : "No user signed in"}
+        {user ? user.user_metadata?.display_name || user.email : ""}
       </Text>
       <View style={styles.inputGroup}>
-        <ThemedText style={styles.label}>Groupe de destination</ThemedText>
+        <ThemedText style={styles.label}>Groupe sélectionné</ThemedText>
         <View style={{ flexDirection: "row", gap: 10 }}>
           <TouchableOpacity
             style={[
