@@ -202,29 +202,29 @@ export default function CreateEvent({
               }}
               value={allDay}
             />
-            {!allDay && (
-              <View>
-                <ThemedText style={styles.label}>
-                  {endDate.toLocaleTimeString([], {
-                    weekday: "long",
-                    day: "2-digit",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </ThemedText>
-                <Pressable
-                  style={styles.button}
-                  onPress={() => {
-                    setIsEndDate(true);
-                    setMode("time");
-                    setShow(true);
-                  }}
-                >
-                  <CalendarClock color={base.colors.text} />
-                </Pressable>
-              </View>
-            )}
           </View>
+          {!allDay && (
+            <View style={styles.row}>
+              <ThemedText style={styles.label}>
+                {endDate.toLocaleTimeString([], {
+                  weekday: "long",
+                  day: "2-digit",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </ThemedText>
+              <Pressable
+                style={styles.button}
+                onPress={() => {
+                  setIsEndDate(true);
+                  setMode("time");
+                  setShow(true);
+                }}
+              >
+                <CalendarClock color={base.colors.text} />
+              </Pressable>
+            </View>
+          )}
         </View>
 
         <View style={styles.inputGroup}>
@@ -284,7 +284,14 @@ export default function CreateEvent({
                       setIsModalVisible(false);
                     }}
                   >
-                    <ThemedText style={{ color: "#000",backgroundColor: "rgba(0,0,0,0)" }}>{item.name}</ThemedText>
+                    <ThemedText
+                      style={{
+                        color: "#000",
+                        backgroundColor: "rgba(0,0,0,0)",
+                      }}
+                    >
+                      {item.name}
+                    </ThemedText>
                   </TouchableOpacity>
                 )}
               />
