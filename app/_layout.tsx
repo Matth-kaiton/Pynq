@@ -1,99 +1,38 @@
-import 'react-native-reanimated';
+import "react-native-reanimated";
 
-import * as Calendar from 'expo-calendar';
-import { useEffect } from 'react';
-import { Button, Platform, StyleSheet, Text, View } from 'react-native';
+import { AuthProvider, useAuth } from "@/components/AuthContext";
+import { Stack, useRouter, useSegments } from "expo-router";
+import { useEffect } from "react";
 
-import { useColorScheme } from '@/hooks/use-color-scheme';
-
-export const unstable_settings = {
-  anchor: '(tabs)',
-};
-
-export default function RootLayout() {
-  const colorScheme = useColorScheme();
+function RootLayoutNav() {
+  const { session, loading } = useAuth();
+  const segments = useSegments();
+  const router = useRouter();
 
   useEffect(() => {
-    (async () => {
-      const { status } = await Calendar.requestCalendarPermissionsAsync();
-      if (status === 'granted') {
-        const calendars = await Calendar.getCalendarsAsync(Calendar.EntityTypes.EVENT);
-        console.log('Here are all your calendars:');
-        console.log({ calendars });
-      }
-    })();
-  }, []);
+    if (loading) return;
+
+    const inAuthGroup = segments[0] === "(tabs)";
+
+    if (!session && inAuthGroup) {
+      router.replace("/login");
+    } else if (session && !inAuthGroup) {
+      router.replace("/(tabs)");
+    }
+  }, [session, loading, segments, router]);
 
   return (
-    <View style={styles.container}>
-      <Text>Calendar Module Example</Text>
-      <Button title="Create a new calendar" onPress={createCalendar} />
-      <Button title="Delete Expo Calendars" onPress={deleteExpoCalendars} />
-    </View>
+    <Stack>
+      <Stack.Screen name="login" options={{ headerShown: false }} />
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+    </Stack>
   );
 }
 
-async function getDefaultCalendarSource() {
-  const defaultCalendar = await Calendar.getDefaultCalendarAsync();
-  return defaultCalendar.source;
+export default function RootLayout() {
+  return (
+    <AuthProvider>
+      <RootLayoutNav />
+    </AuthProvider>
+  );
 }
-
-async function deleteExpoCalendars() {
-  try {
-    const calendars = await Calendar.getCalendarsAsync(Calendar.EntityTypes.EVENT);
-    let deletedCount = 0;
-    for (const calendar of calendars) {
-      if (calendar.title === 'Expo Calendar') {
-        await Calendar.deleteCalendarAsync(calendar.id);
-        console.log(`Deleted calendar with id: ${calendar.id}`);
-        deletedCount++;
-      }
-    }
-    console.log(`Deleted ${deletedCount} calendars.`);
-  } catch (err) {
-    console.error('deleteCalendars failed', err);
-  }
-}
-
-async function createCalendar() {
-  try {
-    let source;
-    if (Platform.OS === 'ios') {
-      const defaultCalendar = await Calendar.getDefaultCalendarAsync();
-      source = defaultCalendar?.source ?? { name: 'Expo Calendar', isLocalAccount: true };
-    } else {
-      source = { isLocalAccount: true, name: 'Expo Calendar' };
-    }
-
-    const calendarParams: any = {
-      title: 'Expo Calendar',
-      color: 'blue',
-      entityType: Calendar.EntityTypes.EVENT,
-      name: 'internalCalendarName',
-      source,
-      ownerAccount: 'personal',
-      accessLevel: Calendar.CalendarAccessLevel.OWNER, // required
-    };
-
-    if (Platform.OS === 'ios') {
-      if (source && typeof (source as any).id !== 'undefined') {
-        calendarParams.sourceId = (source as any).id;
-      }
-      calendarParams.ownerAccount = 'personal';
-    }
-
-    const newCalendarID = await Calendar.createCalendarAsync(calendarParams);
-    console.log(`Your new calendar ID is: ${newCalendarID}`);
-  } catch (err) {
-    console.error('createCalendar failed', err);
-  }
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'space-around',
-  },
-});

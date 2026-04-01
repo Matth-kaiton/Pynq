@@ -1,0 +1,38 @@
+{
+  "colors": {
+    "primary": "#7A4DFF", // Violet électrique (Boutons)
+    "primaryContainer": "#FF922B", // Orange vif (Accent calendrier)
+    "secondary": "#F08C00", // Jaune-Orange (Boutons secondaires)
+    "background": "#F8F0FC", // Lavande ultra pâle (Fond)
+    "surface": "#FFFFFF",
+    "inputBackground": "#FFFFFF",
+    "text": "#F9EBFA",
+    "textSecondary": "#AE3EC9",
+    "border": "#E599F7", // Violet clair (Grille)
+    "calendarHeader": "#7048E8",
+    "calendarDay": "#2F1138",
+    "shadow": "#000"
+  },
+
+  "typography": {
+    "displayLarge": { "fontSize": 57, "fontWeight": "400" },
+    "displayMedium": { "fontSize": 45, "fontWeight": "400" },
+    "displaySmall": { "fontSize": 36, "fontWeight": "400" },
+
+    "headlineLarge": { "fontSize": 32, "fontWeight": "600" },
+    "headlineMedium": { "fontSize": 28, "fontWeight": "600" },
+    "headlineSmall": { "fontSize": 24, "fontWeight": "600" },
+
+    "titleLarge": { "fontSize": 22, "fontWeight": "600" },
+    "titleMedium": { "fontSize": 18, "fontWeight": "500" },
+    "titleSmall": { "fontSize": 16, "fontWeight": "500" },
+
+    "bodyLarge": { "fontSize": 16, "fontWeight": "400" },
+    "bodyMedium": { "fontSize": 14, "fontWeight": "400" },
+    "bodySmall": { "fontSize": 12, "fontWeight": "400" },
+
+    "labelLarge": { "fontSize": 14, "fontWeight": "600" },
+    "labelMedium": { "fontSize": 12, "fontWeight": "500" },
+    "labelSmall": { "fontSize": 11, "fontWeight": "500" }
+  }
+}
