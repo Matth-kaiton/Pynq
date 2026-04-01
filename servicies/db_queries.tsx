@@ -248,6 +248,7 @@ export async function getRemoteEvents(groupId?: string) {
       ...e,
       title: e.title || "Sans titre",
       description: e.description || "Aucune description disponible.",
+      createdBy: getUserById(e.created_by),
       start: new Date(e.start_date),
       end: new Date(e.end_date),
     }));
@@ -279,4 +280,19 @@ export async function leaveGroup(groupId?: string) {
     Alert.alert("Erreur", "Impossible de quitter le groupe.");
     return { success: false, error };
   }
+}
+
+export async function getUserById(userId: string) {
+  const { data: user, error } = await supabase
+    .from("profiles")
+    .select("username")
+    .eq("id", userId)
+    .single();
+
+  if (error || !user) {
+    console.error("Erreur getUserById:", error);
+    return "Utilisateur inconnu";
+  }
+
+  return user.username;
 }

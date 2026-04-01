@@ -260,7 +260,6 @@ export function ShowCalendar({ selectedGroupId }: ShowCalendarProps) {
                 </Text>
               </View>
 
-              {/* Description (si elle existe dans tes données) */}
               {selectedEvent?.description && (
                 <View style={modal.detailRow}>
                   <AlignLeft size={20} color={base.colors.primary} />
@@ -269,6 +268,12 @@ export function ShowCalendar({ selectedGroupId }: ShowCalendarProps) {
                   </Text>
                 </View>
               )}
+
+              <View>
+                <Text style={{ color: base.colors.textSecondary, marginTop: 10 }}>
+                  Créé par : { selectedEvent?.createdBy || "Inconnu" }
+                </Text>
+              </View>
             </View>
           </View>
         </Modal>
